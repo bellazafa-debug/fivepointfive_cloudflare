@@ -399,6 +399,12 @@
 const VIDEO_URL = "";
 const FILM_POSTER = "https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg";
 
+/* Talk to the database directly from the browser — no serverless functions needed.
+   The anon key is public-safe; writes still require the passcode (checked inside the DB). */
+const SB_URL="https://mugbbbfqzxsnaxcmfsnb.supabase.co";
+const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z2JiYmZxenhzbmF4Y21mc25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzI4OTMsImV4cCI6MjA5NTg0ODg5M30.OqHOvDcoQH9PSn5-c4w7jxO9Z4JfExkEZOCn8m75xUs";
+const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"application/json"};
+
 const DEFAULT_DATA = {
   beers:[
     {name:"King Kölsch", type:"Kölsch", abv:"5.0%", desc:"Dry, crisp & refreshing with a pleasant hoppy bitterness.", tag:"🥉 2026 Cap Expo", logo:"assets/beer/king-kolsch.png"},
@@ -465,7 +471,10 @@ function getData(){
 }
 // Load live, shared content from the database (falls back to local/defaults offline).
 async function boot(){
-  try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&Object.keys(j.data).length){ SITE=mergeDefaults(j.data); } } }catch(e){}
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'});
+    if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ SITE=mergeDefaults(d); } }
+  }catch(e){}
   render();
 }
 
@@ -668,12 +677,12 @@ let _rt; window.addEventListener('resize',()=>{ clearTimeout(_rt); _rt=setTimeou
 window.addEventListener('storage', ()=>{ SITE=null; render(); });
 </script>
 <script>
-/* privacy-light analytics beacon — one ping per page load */
+/* privacy-light analytics beacon — one ping per page load, straight to the database */
 (function(){try{
   var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);}
   var ua=navigator.userAgent||''; var d=/iPad|Tablet/i.test(ua)?'Tablet':(/Mobi|Android|iPhone/i.test(ua)?'Mobile':'Desktop');
   var ref=''; try{ if(document.referrer){ var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) ref=h; } }catch(e){}
-  fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({path:location.pathname,visitor:v,device:d,referrer:ref})}).catch(function(){});
+  fetch(SB_URL+'/rest/v1/rpc/track_view',{method:'POST',headers:SB_H,keepalive:true,body:JSON.stringify({p_path:location.pathname,p_visitor:v,p_device:d,p_referrer:ref})}).catch(function(){});
 }catch(e){}})();
 </script>
 </body>

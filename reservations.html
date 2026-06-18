@@ -204,14 +204,17 @@
 
 <script>
 const RESERVATION_EMAIL = "michelle@fivepointfivebrewing.com";
+const SB_URL="https://mugbbbfqzxsnaxcmfsnb.supabase.co";
+const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z2JiYmZxenhzbmF4Y21mc25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzI4OTMsImV4cCI6MjA5NTg0ODg5M30.OqHOvDcoQH9PSn5-c4w7jxO9Z4JfExkEZOCn8m75xUs";
+const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"application/json"};
 
 // Hours (reads shared site data if present, else defaults)
 const DEFAULT_HOURS=[{d:"Monday – Thursday",h:"3:30 PM – 9:00 PM"},{d:"Friday – Saturday",h:"12:00 PM – 10:00 PM"},{d:"Sunday",h:"12:00 PM – 8:00 PM"}];
 function getHours(){ try{const s=localStorage.getItem('fpf_site_data'); if(s){const d=JSON.parse(s); if(d.hours) return d.hours;}}catch(e){} return DEFAULT_HOURS; }
 function renderHours(hrs){ document.getElementById('hoursList').innerHTML = (hrs||[]).map(h=>`<div class="hours-row"><span class="d">${h.d}</span><span>${h.h}</span></div>`).join(''); }
 renderHours(getHours());
-// refresh hours from the live published content
-(async()=>{ try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&j.data.hours) renderHours(j.data.hours); } }catch(e){} })();
+// refresh hours from the live published content (direct from the database)
+(async()=>{ try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.hours) renderHours(d.hours); } }catch(e){} })();
 document.getElementById('yr').textContent=new Date().getFullYear();
 
 // Date: min = today
@@ -286,7 +289,7 @@ function showDone(msg){ if(msg) document.getElementById('doneMsg').textContent=m
   var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);}
   var ua=navigator.userAgent||''; var d=/iPad|Tablet/i.test(ua)?'Tablet':(/Mobi|Android|iPhone/i.test(ua)?'Mobile':'Desktop');
   var ref=''; try{ if(document.referrer){ var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) ref=h; } }catch(e){}
-  fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({path:location.pathname,visitor:v,device:d,referrer:ref})}).catch(function(){});
+  fetch(SB_URL+'/rest/v1/rpc/track_view',{method:'POST',headers:SB_H,keepalive:true,body:JSON.stringify({p_path:location.pathname,p_visitor:v,p_device:d,p_referrer:ref})}).catch(function(){});
 }catch(e){}})();
 </script>
 </body>

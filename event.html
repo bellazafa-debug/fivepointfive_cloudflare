@@ -87,6 +87,9 @@
 
 <script>
 document.getElementById('yr').textContent=new Date().getFullYear();
+const SB_URL="https://mugbbbfqzxsnaxcmfsnb.supabase.co";
+const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z2JiYmZxenhzbmF4Y21mc25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzI4OTMsImV4cCI6MjA5NTg0ODg5M30.OqHOvDcoQH9PSn5-c4w7jxO9Z4JfExkEZOCn8m75xUs";
+const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"application/json"};
 const DEFAULT_EVENTS=[
   {id:"trivia-mc-ken", month:"JUN", day:"18", title:"Trivia Night with MC Ken", when:"Thursday · 7:00 PM", body:"Now every Thursday at Five Point Five @ 7pm — trivia with MC Ken. It's free to play; register your team to get invited to live cash tournaments. Grab a pizza, grab a pint, and put your useless knowledge to good use.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1702238798810-5AOI3MM3TJKEEUYPVCLS/Trivia_with_MC_Ken.png", video:"", link:"https://forms.gle/dd1kB4B78PV4tRMU7", linkLabel:"Register your team", reserveBtn:false},
   {id:"world-cup-usa-australia", month:"JUN", day:"19", title:"World Cup — USA vs Australia", when:"Friday · 12:00 PM", body:"World Cup action on every screen with sound. Join us for beer and food specials throughout the match. Come early for a good seat — or reserve a table so your whole crew is set.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
@@ -100,7 +103,7 @@ function getId(){ return new URLSearchParams(location.search).get('id')||''; }
 
 async function getEvents(){
   // live content first, then local draft, then built-in defaults
-  try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&j.data.events&&j.data.events.length) return j.data.events; } }catch(e){}
+  try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.events&&d.events.length) return d.events; } }catch(e){}
   try{ const s=localStorage.getItem('fpf_site_data'); if(s){ const d=JSON.parse(s); if(d.events&&d.events.length) return d.events; } }catch(e){}
   return DEFAULT_EVENTS;
 }
@@ -153,7 +156,7 @@ render();
   var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);}
   var ua=navigator.userAgent||''; var d=/iPad|Tablet/i.test(ua)?'Tablet':(/Mobi|Android|iPhone/i.test(ua)?'Mobile':'Desktop');
   var ref=''; try{ if(document.referrer){ var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) ref=h; } }catch(e){}
-  fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({path:location.pathname,visitor:v,device:d,referrer:ref})}).catch(function(){});
+  fetch(SB_URL+'/rest/v1/rpc/track_view',{method:'POST',headers:SB_H,keepalive:true,body:JSON.stringify({p_path:location.pathname,p_visitor:v,p_device:d,p_referrer:ref})}).catch(function(){});
 }catch(e){}})();
 </script>
 </body>

@@ -242,11 +242,20 @@ let data = loadLocal();
 let current = 'beers';
 let ADMIN_PW = '';
 
+/* Direct database access from the browser — no serverless functions required.
+   Anon key is public-safe; the passcode is verified inside the database. */
+const SB_URL="https://mugbbbfqzxsnaxcmfsnb.supabase.co";
+const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z2JiYmZxenhzbmF4Y21mc25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzI4OTMsImV4cCI6MjA5NTg0ODg5M30.OqHOvDcoQH9PSn5-c4w7jxO9Z4JfExkEZOCn8m75xUs";
+const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"application/json"};
+
 function mergeDefaults(d){ for(const k in DEFAULT_DATA){ if(d[k]===undefined||d[k]===null) d[k]=JSON.parse(JSON.stringify(DEFAULT_DATA[k])); } return d; }
 function loadLocal(){ try{const s=localStorage.getItem('fpf_site_data'); if(s) return mergeDefaults(JSON.parse(s));}catch(e){} return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
 // Pull the live published content from the database so you're editing what's actually online.
 async function loadLive(){
-  try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&Object.keys(j.data).length){ data=mergeDefaults(j.data); persist(); switchTab(current); } } }catch(e){}
+  try{
+    const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'});
+    if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ data=mergeDefaults(d); persist(); switchTab(current); } }
+  }catch(e){}
 }
 function persist(){ try{ localStorage.setItem('fpf_site_data', JSON.stringify(data)); }catch(e){} }   // local draft
 
@@ -273,10 +282,10 @@ function loadStats(days){
   if(days) statsDays=days;
   const body=document.getElementById('statsBody'); body.textContent='Loading…';
   if(!ADMIN_PW){ body.textContent='Enter your passcode first.'; return; }
-  fetch('/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:ADMIN_PW,days:statsDays})})
+  fetch(SB_URL+'/rest/v1/rpc/site_stats',{method:'POST',headers:SB_H,body:JSON.stringify({p_password:ADMIN_PW,p_days:statsDays})})
     .then(r=>r.json())
-    .then(d=>{ if(!d||d.error){ body.innerHTML='<div style="color:#b4452f">Couldn’t load stats — check your passcode, or the site may not be deployed yet.</div>'; return; } renderStats(d); })
-    .catch(()=>{ body.innerHTML='<div style="color:var(--muted)">Analytics will appear once the site is live (it can’t run on the local file).</div>'; });
+    .then(d=>{ if(!d||d.error){ body.innerHTML='<div style="color:#b4452f">Couldn’t load stats — check your passcode.</div>'; return; } renderStats(d); })
+    .catch(()=>{ body.innerHTML='<div style="color:var(--muted)">Couldn’t reach the database.</div>'; });
 }
 function renderStats(d){
   const card='background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px';
@@ -308,11 +317,12 @@ async function saveAlbum(){
   showToast('Checking album…');
   try{
     const r=await fetch('/api/photos?album='+encodeURIComponent(link),{cache:'no-store'});
+    if(!r.ok) throw 0;
     const j=await r.json();
     if(j && j.photos && j.photos.length) showToast('Album linked ✓ — found '+j.photos.length+' photos');
     else if(j && j.error) showToast('Saved, but Apple returned an error — re-check the link');
     else showToast('Saved, but 0 photos found — is the album set to “Public Website”?');
-  }catch(e){ showToast('Saved — album will load on the live site'); }
+  }catch(e){ showToast('Saved ✓ (album auto-sync needs the API functions enabled)'); }
 }
 
 /* resize an uploaded image to a small JPEG data URL so it fits in storage */
@@ -445,16 +455,16 @@ function removeItem(i){ data[current].splice(i,1); persist(); renderList(); show
 // Publish the working copy to the live site (database).
 async function saveAll(){
   persist();
-  if(location.protocol==='file:'){ showToast('This is the local file — open your LIVE site’s /admin to publish'); return; }
   if(!ADMIN_PW){ showToast('Enter your passcode first'); return; }
   const btn=document.getElementById('saveBtn'); if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
   try{
-    const r=await fetch('/api/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:ADMIN_PW,data})});
-    if(r.ok){ showToast('Published live ✓ — everyone sees it now'); }
-    else if(r.status===401){ showToast('Wrong passcode — not published'); }
-    else if(r.status===404){ showToast('API not found (404) — functions didn’t deploy on the host'); }
-    else { showToast('Couldn’t publish ('+r.status+') — saved locally'); }
-  }catch(e){ showToast('Couldn’t reach /api/content — saved locally'); }
+    const r=await fetch(SB_URL+'/rest/v1/rpc/publish_content',{method:'POST',headers:SB_H,body:JSON.stringify({p_password:ADMIN_PW,p_data:data})});
+    if(r.ok){
+      const ok=await r.json();           // database returns true/false
+      if(ok===true){ showToast('Published live ✓ — everyone sees it now'); }
+      else { showToast('Wrong passcode — not published'); }
+    } else { showToast('Couldn’t publish ('+r.status+') — saved locally, try again'); }
+  }catch(e){ showToast('Couldn’t reach the database — saved locally'); }
   finally{ if(btn){ btn.disabled=false; btn.textContent='💾 Publish changes'; } }
 }
 
