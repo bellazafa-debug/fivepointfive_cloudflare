@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Five Point Five Brewing Co — El Segundo</title>
+<meta name="description" content="Hand crafted beer inspired by our little 5.5 square mile corner of paradise. Craft beer, hard seltzer & car-themed wood-fired pizza in El Segundo, CA." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+<style>
+  :root{
+    --paper:#f1e8d6;
+    --paper-deep:#e7dcc4;
+    --table:#d8c8a6;
+    --card:#fbf6ea;
+    --polaroid:#ffffff;
+    --ink:#3a2f24;
+    --ink-soft:#5b4d3c;
+    --muted:#8a7b64;
+    --line:#dccfb4;
+    --terra:#c2744f;
+    --teal:#6b9b8d;
+    --ochre:#cba23f;
+    --radius:14px;
+    --maxw:1140px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;position:relative}
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.45;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/></svg>");}
+  .above{position:relative;z-index:2}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.5px;line-height:.96;text-transform:uppercase}
+  .eyebrow{font-size:12.5px;letter-spacing:3.5px;text-transform:uppercase;color:var(--terra);font-weight:700}
+  .btn{display:inline-flex;align-items:center;gap:9px;padding:13px 26px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:none;transition:transform .15s ease,background .15s ease,color .15s}
+  .btn-primary{background:var(--terra);color:#fff7ee}
+  .btn-primary:hover{background:#a95f3d;transform:translateY(-2px)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
+
+  /* age gate */
+  #agegate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #agegate .box{max-width:460px;position:relative;z-index:3}
+  #agegate img{width:88px;margin:0 auto 24px}
+  #agegate h2{font-size:clamp(34px,7vw,52px)}
+  #agegate p{color:var(--muted);margin:14px 0 30px}
+  .gate-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  /* nav */
+  header.nav{position:sticky;top:0;z-index:900;background:rgba(241,232,214,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px}
+  .nav-logo{display:inline-flex;align-items:center}
+  .nav-logo img{height:40px;display:block}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{font-weight:600;font-size:15px;color:var(--ink-soft);transition:color .15s}
+  .nav-links a:hover{color:var(--terra)}
+  .menu-toggle{display:none;background:none;border:none;color:var(--ink);font-size:26px;cursor:pointer}
+
+  /* hero */
+  .hero{position:relative;min-height:86vh;display:flex;align-items:center;overflow:hidden}
+  .map-corner{position:absolute;top:50%;right:-4%;transform:translateY(-50%);
+    width:min(108vw,1180px);height:128%;z-index:1;
+    background:url("https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/9dc02fe2-92c1-4687-a22b-172e13ce6b9c/mid+century+map.png") right center / contain no-repeat;
+    opacity:.6;filter:sepia(.35) contrast(.95) saturate(.9);
+    -webkit-mask-image:linear-gradient(to left, #000 6%, rgba(0,0,0,.85) 30%, rgba(0,0,0,.35) 58%, transparent 82%);
+            mask-image:linear-gradient(to left, #000 6%, rgba(0,0,0,.85) 30%, rgba(0,0,0,.35) 58%, transparent 82%);}
+  .hero-inner{position:relative;z-index:2;padding:60px 24px}
+  .hero .tag{display:inline-flex;align-items:center;gap:10px;padding:8px 16px;border:1px solid var(--line);background:var(--card);border-radius:999px;font-size:13px;color:var(--ink-soft);margin-bottom:26px}
+  .hero .tag .dot{width:8px;height:8px;border-radius:50%;background:var(--teal);box-shadow:0 0 0 4px rgba(107,155,141,.22)}
+  .hero h1{font-size:clamp(52px,10.5vw,132px);margin:0}
+  .hero h1 .l2{color:var(--terra)}
+  .hero .lead{font-size:clamp(18px,2.2vw,22px);color:var(--ink-soft);max-width:540px;margin:18px 0 32px;line-height:1.55}
+  .hero-cta{display:flex;flex-wrap:wrap;gap:14px}
+  .hero-meta{display:flex;gap:34px;margin-top:44px;flex-wrap:wrap}
+  .hero-meta .k{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--terra);font-weight:700;margin-bottom:4px;display:block}
+  .hero-meta .v{font-weight:700;display:block}
+
+  /* film / quote */
+  .film{position:relative;height:78vh;min-height:480px;overflow:hidden;background:#1c160f}
+  .film .media,.film video,.film .poster{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .film .poster{background-size:cover;background-position:center;animation:kenburns 26s ease-in-out infinite alternate;filter:saturate(.92) contrast(1.04) sepia(.12)}
+  @keyframes kenburns{from{transform:scale(1.04) translateY(0)}to{transform:scale(1.16) translateY(-2%)}}
+  .film::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(20,16,11,.55),rgba(20,16,11,.25) 35%,rgba(20,16,11,.7));z-index:2}
+  .film .bars{position:absolute;left:0;right:0;height:42px;background:rgba(15,11,7,.85);z-index:4}
+  .film .bars.top{top:0}.film .bars.bottom{bottom:0}
+  .film .grain{position:absolute;inset:0;z-index:3;opacity:.12;pointer-events:none;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");}
+  .film .quote{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;cursor:pointer}
+  .film .quote .mark{font-family:'DM Serif Display',serif;color:var(--ochre);font-size:70px;line-height:.4;opacity:.85}
+  .film .quote blockquote{font-family:'DM Serif Display',serif;font-style:italic;color:#fdf6e7;font-size:clamp(22px,3.4vw,40px);max-width:780px;margin:18px 0 18px;text-shadow:0 2px 18px rgba(0,0,0,.4);transition:opacity .5s}
+  .film .quote .by{color:#f0e4cf;font-weight:600;letter-spacing:.5px;transition:opacity .5s}
+  .film .quote .src{color:var(--ochre);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+  .film .hint{position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(253,246,231,.6);font-size:12px;letter-spacing:1px}
+
+  /* section shell */
+  section.block{padding:90px 0;border-top:1px solid var(--line)}
+  .sec-head{display:flex;justify-content:space-between;align-items:flex-end;gap:24px;margin-bottom:42px;flex-wrap:wrap}
+  .sec-head h2{font-size:clamp(34px,6vw,66px)}
+  .sec-head h2 .by{font-size:.5em;color:var(--terra)}
+
+  /* on tap */
+  .tap-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:18px}
+  .tap{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:22px;transition:transform .18s,box-shadow .18s}
+  .tap:hover{transform:translateY(-4px);box-shadow:0 12px 24px rgba(58,47,36,.1)}
+  .tap .toprow{display:flex;align-items:center;gap:13px;margin-bottom:12px}
+  .tap .logo{width:60px;height:60px;border-radius:50%;object-fit:contain;background:#fff;border:1px solid var(--line);padding:3px;flex:none}
+  .tap .type{font-size:11.5px;letter-spacing:1.5px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .tap h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:25px;margin-top:2px;line-height:.98}
+  .tap .desc{color:var(--ink-soft);font-size:14px;min-height:40px}
+  .tap .foot{display:flex;justify-content:space-between;align-items:center;margin-top:16px;padding-top:14px;border-top:1px solid var(--line)}
+  .tap .abv{font-weight:800;color:var(--terra)}
+  .pill{font-size:11px;font-weight:700;letter-spacing:1px;text-transform:uppercase;padding:4px 10px;border-radius:999px;border:1px solid var(--line);color:var(--muted)}
+  .tap .award{display:inline-flex;align-items:center;gap:8px;margin-top:13px;padding:6px 13px 6px 8px;background:rgba(217,164,65,.12);border:1px solid rgba(217,164,65,.42);border-radius:999px;font-size:12.5px;font-weight:700;color:var(--ink-soft);line-height:1.2}
+  .tap .award svg{flex:none;filter:drop-shadow(0 1px 1px rgba(0,0,0,.12))}
+  .subhead{font-family:'Anton',sans-serif;text-transform:uppercase;font-size:22px;letter-spacing:.5px;margin:46px 0 18px;color:var(--ink);display:flex;align-items:center;gap:14px}
+  .subhead::after{content:"";flex:1;height:1px;background:var(--line)}
+
+  /* pizzas */
+  .pizza-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:20px}
+  .pizza{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .18s,box-shadow .18s}
+  .pizza:hover{transform:translateY(-4px);box-shadow:0 14px 26px rgba(58,47,36,.12)}
+  .pizza .img{aspect-ratio:1/1;background:radial-gradient(circle at 50% 40%, #fff7e9, var(--paper-deep));display:flex;align-items:center;justify-content:center}
+  .pizza .img img{width:80%;height:80%;object-fit:contain}
+  .pizza .body{padding:20px 22px 24px}
+  .pizza h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:24px;margin-bottom:8px;line-height:1}
+  .pizza p{color:var(--ink-soft);font-size:14px}
+
+  /* photo PILE */
+  #gallery{background:radial-gradient(120% 90% at 50% 0%, rgba(0,0,0,.05), transparent 60%), var(--table)}
+  .pile{position:relative;width:100%;margin-top:8px}
+  .photo{position:absolute;background:var(--polaroid);padding:6px;border-radius:2px;
+    box-shadow:0 7px 16px rgba(40,30,18,.32);cursor:pointer;transition:transform .16s ease, box-shadow .16s ease;will-change:transform}
+  .photo .ph{width:100%;height:100%;background:#cdbf9f center/cover no-repeat;filter:saturate(.9) contrast(1.04) sepia(.1)}
+  .photo:hover{box-shadow:0 18px 34px rgba(40,30,18,.45);z-index:999 !important}
+  .pile-note{text-align:center;color:var(--ink-soft);font-size:13px;margin-top:18px;letter-spacing:.3px}
+
+  /* lightbox */
+  #lightbox{position:fixed;inset:0;z-index:9990;background:rgba(34,26,18,.93);display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px}
+  #lightbox.open{display:flex}
+  #lightbox .frame{background:var(--polaroid);padding:10px;border-radius:3px;max-width:min(86vw,720px);box-shadow:0 30px 60px rgba(0,0,0,.5);transform:rotate(-1.2deg)}
+  #lightbox .frame img{width:100%;max-height:68vh;object-fit:contain;background:#000}
+  #lightbox .lbcap{font-weight:600;text-align:center;padding:16px;color:#f0e4cf}
+  #lightbox .x{position:absolute;top:22px;right:26px;font-size:34px;color:#fff;cursor:pointer;line-height:1}
+  #lightbox .arrow{position:absolute;top:50%;transform:translateY(-50%);font-size:46px;color:#fff;cursor:pointer;user-select:none;padding:10px;opacity:.8}
+  #lightbox .arrow:hover{opacity:1}
+  #lightbox .prev{left:14px}.next{right:14px}
+
+  /* events */
+  .events{display:flex;flex-direction:column;gap:14px}
+  .event{display:grid;grid-template-columns:92px 1fr auto;gap:22px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:20px 24px;transition:transform .18s,box-shadow .18s}
+  .event:hover{transform:translateX(4px);box-shadow:0 10px 22px rgba(58,47,36,.1)}
+  .date-chip{text-align:center;border-right:1px solid var(--line);padding-right:14px}
+  .date-chip .mo{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--terra);font-weight:800}
+  .date-chip .day{font-family:'Anton',sans-serif;font-size:40px;line-height:.9}
+  .event .info h3{font-size:20px;font-weight:800;margin-bottom:3px}
+  .event .info .when{font-size:13px;color:var(--muted)}
+  .event .info .blurb{font-size:13px;color:var(--ink-soft);margin-top:5px;max-width:560px}
+  .event .go{font-size:13px;font-weight:700;color:var(--terra);white-space:nowrap}
+
+  /* visit */
+  .visit{display:grid;grid-template-columns:1fr 1fr;gap:30px;align-items:stretch}
+  .visit .panel{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:34px}
+  .hours-row{display:flex;justify-content:space-between;padding:11px 0;border-bottom:1px solid var(--line);font-size:15px}
+  .hours-row:last-child{border-bottom:none}
+  .hours-row .d{color:var(--muted)}.hours-row .h{font-weight:600}
+  .visit .map{border-radius:var(--radius);overflow:hidden;border:1px solid var(--line);min-height:340px}
+  .visit .map iframe{width:100%;height:100%;min-height:340px;border:0;filter:sepia(.22) saturate(1.05) contrast(.98)}
+  .addr{font-size:18px;font-weight:700;margin:6px 0 22px}
+
+  /* cta band */
+  .band{padding:84px 0;text-align:center;background:linear-gradient(180deg,var(--paper),var(--paper-deep));border-top:1px solid var(--line)}
+  .band h2{font-size:clamp(34px,7vw,74px);margin-bottom:16px}
+  .band p{color:var(--ink-soft);max-width:480px;margin:0 auto 30px}
+  .band .row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
+
+  /* footer */
+  footer{background:var(--ink);color:var(--paper);padding:58px 0 40px;position:relative;z-index:2}
+  .foot-grid{display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;margin-bottom:40px}
+  footer img.logo{height:44px;margin-bottom:16px}
+  footer .mtd{color:#c9bca6;font-size:14px;max-width:280px}
+  .foot-col h4{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--ochre);margin-bottom:14px}
+  .foot-col a{display:block;color:#c9bca6;font-size:14px;padding:5px 0;transition:color .15s}
+  .foot-col a:hover{color:#fff}
+  .socials{display:flex;gap:12px;margin-top:8px}
+  .socials a{width:40px;height:40px;border:1px solid #5b4d3c;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#c9bca6;transition:.15s;font-size:17px}
+  .socials a:hover{border-color:var(--ochre);color:var(--ochre)}
+  .copy{border-top:1px solid #5b4d3c;padding-top:24px;color:#c9bca6;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+
+  .editnote{position:fixed;bottom:18px;right:18px;z-index:800;background:var(--card);border:1px solid var(--terra);color:var(--ink);padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 12px 30px rgba(58,47,36,.22)}
+  .editnote a{color:var(--terra);font-weight:700}
+
+  @media(max-width:860px){
+    .nav-links{display:none}
+    .nav .btn-primary{display:none}   /* remove the reservation button from the mobile top bar */
+    .menu-toggle{display:block}
+    .visit{grid-template-columns:1fr}
+    .event{grid-template-columns:74px 1fr}
+    .event .go{display:none}
+    .hero{min-height:auto;padding:18px 0 40px}
+    .hero-inner{padding:30px 22px;text-align:center}
+    .hero .lead{margin:16px auto 26px}
+    .hero-cta{justify-content:center}
+    .hero-meta{justify-content:center;gap:26px;text-align:center}
+    .btn{padding:12px 20px;font-size:14px}
+    .map-corner{opacity:.18;width:min(130vw,460px);height:40%;top:5%;transform:none}
+  }
+</style>
+</head>
+<body>
+
+<!-- AGE GATE -->
+<div id="agegate">
+  <div class="box">
+    <img src="https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/89dfbb95-1764-4b6a-9569-8ce6cf9cf0ac/icon-cmyk.png?format=1500w" alt="Five Point Five" />
+    <h2 class="display">Are you<br>over 21?</h2>
+    <p>You must be of legal drinking age to enter.</p>
+    <div class="gate-row">
+      <button class="btn btn-primary" onclick="passGate()">Yes, I'm 21+</button>
+      <a class="btn btn-ghost" href="https://www.responsibility.org">No</a>
+    </div>
+  </div>
+</div>
+<script>
+  // If they've confirmed 21+ within the last 24h, skip the gate (runs before the rest of the page).
+  try{ var _ag=+localStorage.getItem('fpf_age_ok'); if(_ag && (Date.now()-_ag)<86400000){ document.getElementById('agegate').style.display='none'; } }catch(e){}
+</script>
+
+<!-- NAV -->
+<header class="nav above">
+  <div class="wrap nav-inner">
+    <a class="nav-logo" href="#top"><img src="assets/logo-dark.png" alt="Five Point Five Brewing Co" /></a>
+    <nav class="nav-links">
+      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#visit">Visit</a>
+    </nav>
+    <a class="btn btn-primary" href="reservations.html">Make a Reservation</a>
+    <button class="menu-toggle" onclick="document.querySelector('.nav-links').style.display='flex'">≡</button>
+  </div>
+</header>
+
+<!-- HERO -->
+<section class="hero above" id="top">
+  <div class="map-corner"></div>
+  <div class="wrap hero-inner">
+    <span class="tag"><span class="dot" id="open-dot"></span> <span id="open-text">El Segundo, CA</span></span>
+    <h1 class="display">Your favorite<br>brewery's <span class="l2">favorite<br>brewery.</span></h1>
+    <p class="lead">Hand crafted beer inspired by our little 5.5 square mile corner of paradise.</p>
+    <div class="hero-cta">
+      <a class="btn btn-primary" href="reservations.html">Make a Reservation →</a>
+      <a class="btn btn-ghost" href="#tap">See What's On Tap</a>
+    </div>
+    <div class="hero-meta">
+      <div><span class="k">Find us</span><span class="v">137 Nevada St.</span></div>
+      <div id="tonight-wrap" style="display:none"><span class="k">Tonight</span><span class="v" id="hero-tonight"></span></div>
+      <div><span class="k">Call</span><span class="v">(424) 248-8379</span></div>
+    </div>
+  </div>
+</section>
+
+<!-- FILM / QUOTE -->
+<section class="film" id="film" title="Click the quote for another">
+  <div class="bars top"></div>
+  <div class="poster" id="film-poster"></div>
+  <div class="grain"></div>
+  <div class="quote" id="quote-box" onclick="nextQuote()">
+    <div class="mark">&ldquo;</div>
+    <blockquote id="q-text"></blockquote>
+    <div class="by" id="q-by"></div>
+    <div class="src" id="q-src"></div>
+  </div>
+  <div class="bars bottom"></div>
+  <div class="hint">tap quote for another</div>
+</section>
+
+<!-- ON TAP -->
+<section class="block above" id="tap">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">On Tap</span><h2 class="display">Our Beers</h2></div>
+    </div>
+    <div class="tap-grid" id="tap-grid"></div>
+    <div class="subhead">Hard Seltzers · 5% ABV</div>
+    <div class="tap-grid" id="seltzer-grid"></div>
+  </div>
+</section>
+
+<!-- PIZZA -->
+<section class="block above" id="pizza">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><h2 class="display">Pi's <span class="by">by Pi LA</span></h2></div>
+    </div>
+    <div class="pizza-grid" id="pizza-grid"></div>
+  </div>
+</section>
+
+<!-- EVENTS -->
+<section class="block above" id="events">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">What's On</span><h2 class="display">Upcoming Events</h2></div>
+    </div>
+    <div class="events" id="events-list"></div>
+  </div>
+</section>
+
+<!-- PHOTO PILE -->
+<section class="block above" id="gallery">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Life at Five Point Five</span><h2 class="display">The Photo Box</h2></div>
+    </div>
+    <div class="pile" id="pile"></div>
+    <div class="pile-note" id="pile-note">Tap a photo to take a closer look ✦</div>
+    <div style="text-align:center;margin-top:14px"><button class="btn btn-ghost" id="moreBtn" style="display:none" onclick="morePhotos()">More photos →</button></div>
+  </div>
+</section>
+
+<!-- VISIT -->
+<section class="block above" id="visit">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Come Hang</span><h2 class="display">Hours & Location</h2></div></div>
+    <div class="visit">
+      <div class="panel">
+        <span class="eyebrow">Visit us at</span>
+        <div class="addr">137 Nevada St.<br>El Segundo, CA 90245</div>
+        <div id="hours-list"></div>
+        <div style="margin-top:24px;display:flex;gap:12px;flex-wrap:wrap">
+          <a class="btn btn-ghost" href="tel:4242488379">Call us</a>
+          <a class="btn btn-ghost" href="mailto:hello@fivepointfivebrewing.com">Email</a>
+        </div>
+      </div>
+      <div class="map"><iframe loading="lazy" src="https://www.google.com/maps?q=137+Nevada+St,+El+Segundo,+CA+90245&output=embed" title="Map to Five Point Five Brewing"></iframe></div>
+    </div>
+  </div>
+</section>
+
+<!-- RESERVE -->
+<section class="band above" id="reserve">
+  <div class="wrap">
+    <span class="eyebrow">Save your spot</span>
+    <h2 class="display">Pull up a stool</h2>
+    <p>Book a table for the game, a trivia team, or a private party in the back patio.</p>
+    <div class="row">
+      <a class="btn btn-primary" href="reservations.html">Make a Reservation →</a>
+      <a class="btn btn-ghost" href="https://www.toasttab.com/five-point-five-brewing-co-137-nevada-street/giftcards">Buy a Gift Card</a>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap">
+    <div class="foot-grid">
+      <div>
+        <img class="logo" src="https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/2b63efa4-828f-41bf-a826-b79e54054cf4/fivepointfive-horz-logo-white-wCity.png" alt="Five Point Five Brewing Co" />
+        <p class="mtd">Hand crafted beer inspired by our little 5.5 square mile corner of paradise. El Segundo, CA.</p>
+        <div class="socials">
+          <a href="https://www.instagram.com/fivepointfivebrewing" aria-label="Instagram"><i class="fa-brands fa-instagram"></i></a>
+          <a href="http://facebook.com/fivepointfivebrewing" aria-label="Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://twitter.com/5point5brewing" aria-label="X"><i class="fa-brands fa-x-twitter"></i></a>
+          <a href="https://www.yelp.com/biz/five-point-five-brewing-el-segundo-2" aria-label="Yelp"><i class="fa-brands fa-yelp"></i></a>
+        </div>
+      </div>
+      <div class="foot-col"><h4>Explore</h4><a href="#tap">Beer & Seltzer</a><a href="#pizza">Pi's by Pi LA</a><a href="#gallery">Photos</a><a href="#events">Events</a></div>
+      <div class="foot-col"><h4>Do More</h4>
+        <a href="reservations.html">Reservations</a>
+        <a href="https://www.toasttab.com/five-point-five-brewing-co-137-nevada-street/giftcards">Buy Gift Cards</a>
+        <a href="https://www.toasttab.com/five-point-five-brewing-co-137-nevada-street/findcard">Check Card Balance</a>
+        <a href="https://www.yelp.com/biz/five-point-five-brewing-el-segundo-2">Reviews</a>
+      </div>
+      <div class="foot-col"><h4>Visit</h4>
+        <a href="https://www.google.com/maps?q=137+Nevada+St,+El+Segundo,+CA+90245">137 Nevada St.</a>
+        <a href="#">El Segundo, CA 90245</a>
+        <a href="tel:4242488379">(424) 248-8379</a>
+        <a href="mailto:hello@fivepointfivebrewing.com">hello@fivepointfivebrewing.com</a>
+      </div>
+    </div>
+    <div class="copy"><span>© <span id="yr"></span> Five Point Five Brewing Co. Please drink responsibly.</span><span>Made in El Segundo 🌅🍻</span></div>
+  </div>
+</footer>
+
+<!-- LIGHTBOX -->
+<div id="lightbox">
+  <span class="x" onclick="closeLB()">×</span>
+  <span class="arrow prev" onclick="stepLB(-1)">‹</span>
+  <span class="arrow next" onclick="stepLB(1)">›</span>
+  <div class="frame"><img id="lb-img" src="" alt="" /></div>
+  <div class="lbcap" id="lb-cap"></div>
+</div>
+
+<div class="editnote above">Demo preview — content is editable in <a href="admin.html">the admin dashboard →</a></div>
+
+<script>
+const VIDEO_URL = "";
+const FILM_POSTER = "https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg";
+
+const DEFAULT_DATA = {
+  beers:[
+    {name:"King Kölsch", type:"Kölsch", abv:"5.0%", desc:"Dry, crisp & refreshing with a pleasant hoppy bitterness.", tag:"🥉 2026 Cap Expo", logo:"assets/beer/king-kolsch.png"},
+    {name:"Amber Waves", type:"Amber Ale", abv:"4.9%", desc:"Light crisp malt, toasted caramel, slightly sweet finish.", tag:"", logo:"assets/beer/amber-waves.png"},
+    {name:"Citrus Aftermath", type:"Tropical IPA", abv:"6.6%", desc:"Juicy hops up front — grapefruit, pine & tropical fruit.", tag:"", logo:"assets/beer/citrus-aftermath.png"},
+    {name:"Hazy Daisy", type:"Hazy IPA", abv:"6.8%", desc:"Intense fruit flavor and aroma, soft body, smooth finish.", tag:"", logo:"assets/beer/hazy-daisy.png"},
+    {name:"Bungalow 304", type:"West Coast IPA", abv:"7.0%", desc:"A clean, well-balanced West Coast IPA.", tag:"", logo:"assets/beer/bungalow-304.png"},
+    {name:"Pacific Standard", type:"West Coast IPA", abv:"7.2%", desc:"Intense hoppiness with pine and citrus notes.", tag:"", logo:"assets/beer/pacific-standard.png"},
+    {name:"John Wit", type:"Belgian Wit", abv:"5.5%", desc:"Golden, slightly hazy; fresh wheat, coriander & orange peel.", tag:"", logo:"assets/beer/john-wit.png"},
+    {name:"Tank Farm", type:"Imperial Stout", abv:"10.0%", desc:"Full sweet malt — coffee, dark chocolate & burnt sugar.", tag:"🥉 2026 Brewers Cup", logo:"assets/beer/tank-farm.png"},
+    {name:"German Chocolate Cake", type:"Chocolate Stout", abv:"6.0%", desc:"Smooth chocolate with vanilla notes and cocoa nibs.", tag:"", logo:"assets/beer/german-chocolate-cake.png"}
+  ],
+  seltzers:[
+    {name:"Mango", type:"Hard Seltzer", abv:"5%", desc:"Bright, juicy mango. Crisp and clean.", tag:"Seltzer"},
+    {name:"Cherry", type:"Hard Seltzer", abv:"5%", desc:"Ripe dark cherry, lightly tart.", tag:"Seltzer"},
+    {name:"Capri Sun", type:"Hard Seltzer", abv:"5%", desc:"Tastes like the lunchbox classic, grown up.", tag:"Seltzer"},
+    {name:"Ube", type:"Hard Seltzer", abv:"5%", desc:"Filipino purple yam — smooth and a little nutty.", tag:"Seltzer"}
+  ],
+  pizzas:[
+    {name:"GTX Muscle Car", desc:"Fresh mozzarella, cupped pepperoni, fennel pollen sausage, roasted red onion. Cheese crust.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d8f386c7-f758-4661-8937-00df2e3a1430/GTX.png"},
+    {name:"Lil Red Corvette", desc:"Oven-sweetened cherry tomatoes, mozzarella, basil.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d37a70f8-2075-47cd-b890-55dea75d80b1/Corvette.png"},
+    {name:"Jeepney", desc:"Smoked Filipino sausage, onions & sweet peppers, ube yams, banana tomato sauce. Cheese crust.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d6e69a6f-b3eb-4cd6-8696-9cf6a942ba99/Jeepney.png"},
+    {name:"Opal GT", desc:"Jack & provolone, mozzarella, fontina, bechamel sauce.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/25f81f9e-9426-4e7b-aaf1-a419c440452a/Opal.png"},
+    {name:"VW Bus", desc:"Vegan harissa tomato sauce, olive mix and kale, roasted garlic eggplant.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/fe9944e0-3f7a-448b-bb97-6a4763a588d7/VW+Bus.png"}
+  ],
+  gallery:[
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"Golden hour"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Oktoberfest"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", cap:"World Cup patio"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757005326187-KYTEGI5KF5Y722ZO5FR2/IMG_4686.jpg", cap:"Mahjong night"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1770316497758-NRUJLVI3N7ORBSMVG6I2/superbowl-5.jpg", cap:"Big game Sunday"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757015828848-VIS77RP1ZQIU88VW5AGA/401772714.jpeg", cap:"NFL kickoff"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1773953806022-X2ED0IOV1KKJFZ161PXP/5.5+Karaoke.jpeg", cap:"First Friday karaoke"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1773951344346-W8RDPIGMLJL9DA6Q2Q0Z/braidsbeer.jpeg", cap:"Beers & braids"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/cb2ae6c5-2249-451c-803a-2e668ca95c4a/Sweet+Melissa+Art.png", cap:"Sweet Melissa"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"The taproom"}
+  ],
+  quotes:[
+    {text:"Best little brewery in El Segundo — the patio on a Friday is unbeatable.", by:"Yelp reviewer", src:"Yelp ★★★★★"},
+    {text:"The car-themed pizzas are no gimmick. The Jeepney is genuinely incredible.", by:"Google review", src:"Google ★★★★★"},
+    {text:"Trivia night is the highlight of our week. Feels like a neighborhood living room.", by:"A regular", src:"From the bar"},
+    {text:"Came for the seltzers, stayed for the people. This place just feels like home.", by:"Yelp reviewer", src:"Yelp ★★★★★"}
+  ],
+  events:[
+    {id:"trivia-mc-ken", month:"JUN", day:"18", title:"Trivia Night with MC Ken", when:"Thursday · 7:00 PM", blurb:"Free weekly trivia — join the league for cash tournaments.", body:"Now every Thursday at Five Point Five @ 7pm — trivia with MC Ken. It's free to play; register your team to get invited to live cash tournaments. Grab a pizza, grab a pint, and put your useless knowledge to good use.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1702238798810-5AOI3MM3TJKEEUYPVCLS/Trivia_with_MC_Ken.png", video:"", link:"https://forms.gle/dd1kB4B78PV4tRMU7", linkLabel:"Register your team", reserveBtn:false},
+    {id:"world-cup-usa-australia", month:"JUN", day:"19", title:"World Cup — USA vs Australia", when:"Friday · 12:00 PM", blurb:"All screens, full sound, beer & food specials.", body:"World Cup action on every screen with sound. Join us for beer and food specials throughout the match. Come early for a good seat — or reserve a table so your whole crew is set.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
+    {id:"world-cup-usa-turkiye", month:"JUN", day:"25", title:"World Cup — USA vs Türkiye", when:"Thursday · 7:00 PM", blurb:"Back-patio party on two big screens.", body:"Back-patio World Cup party on two big screens with sound, plus a bar in the back so you never miss a second. Beer and food specials all match long.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
+    {id:"pongs-and-pints", month:"JUL", day:"01", title:"Pongs & Pints — Filipino Mahjong", when:"Wednesday · 6:00 PM", blurb:"Learn or play — all skill levels welcome.", body:"Join us for a night of Filipino Mahjong. New to the game? Teachers are on hand to show you the ropes. All skill levels welcome — we'll match you with the right table. Grab your spot and enjoy gameplay with a pint in hand.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757005326187-KYTEGI5KF5Y722ZO5FR2/IMG_4686.jpg", video:"", link:"", linkLabel:"", reserveBtn:true}
+  ],
+  hours:[
+    {d:"Monday – Thursday", h:"3:30 PM – 9:00 PM"},
+    {d:"Friday – Saturday", h:"12:00 PM – 10:00 PM"},
+    {d:"Sunday", h:"12:00 PM – 8:00 PM"}
+  ],
+  settings:{ albumUrl:"" }
+};
+
+let SITE=null;
+function mergeDefaults(d){ for(const k in DEFAULT_DATA){ if(d[k]===undefined||d[k]===null) d[k]=DEFAULT_DATA[k]; } return d; }
+function getData(){
+  if(SITE) return SITE;
+  try{ const s=localStorage.getItem('fpf_site_data'); if(s){ return mergeDefaults(JSON.parse(s)); } }catch(e){}
+  return DEFAULT_DATA;
+}
+// Load live, shared content from the database (falls back to local/defaults offline).
+async function boot(){
+  try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&Object.keys(j.data).length){ SITE=mergeDefaults(j.data); } } }catch(e){}
+  render();
+}
+
+let GAL=[], MANUAL=[], QUOTES=[], qIndex=0;
+const PILE_SIZE=30; let pilePage=0;
+function pilePages(){ return Math.max(1, Math.ceil(GAL.length/PILE_SIZE)); }
+
+function medalSVG(c){
+  return `<svg viewBox="0 0 24 24" width="22" height="22" aria-hidden="true">
+    <path d="M7.6 1.6l2.7 4.9-3 1.5-2.6-4.8z" fill="${c}" opacity=".5"/>
+    <path d="M16.4 1.6l-2.7 4.9 3 1.5 2.6-4.8z" fill="${c}" opacity=".5"/>
+    <circle cx="12" cy="15" r="6.6" fill="${c}"/>
+    <circle cx="12" cy="15" r="6.6" fill="none" stroke="rgba(0,0,0,.18)" stroke-width="1"/>
+    <circle cx="12" cy="15" r="4.7" fill="none" stroke="rgba(255,255,255,.45)" stroke-width="1"/>
+    <path d="M12 11.4l1.06 2.15 2.37.34-1.72 1.67.41 2.36L12 16.97l-2.12 1.11.41-2.36-1.72-1.67 2.37-.34z" fill="#fff" opacity=".92"/>
+  </svg>`;
+}
+function beerCard(b){
+  const tag=(b.tag||'').trim();
+  const medal=/[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}]/u.test(tag);
+  let award='', pill='';
+  if(medal){
+    const txt=tag.replace(/[\u{1F947}\u{1F948}\u{1F949}\u{1F3C5}]/gu,'').trim();
+    const color = /[\u{1F947}\u{1F3C5}]/u.test(tag) ? '#d6a23c' : (/\u{1F948}/u.test(tag) ? '#b7b9bf' : '#c1773d');
+    award = `<div class="award">${medalSVG(color)}<span>${txt}</span></div>`;
+  } else if(tag){
+    pill = `<span class="pill">${tag}</span>`;
+  }
+  return `<div class="tap">
+    <div class="toprow">
+      ${b.logo?`<img class="logo" src="${b.logo}" alt="${b.name}">`:''}
+      <div><div class="type">${b.type||''}</div><h3>${b.name}</h3></div>
+    </div>
+    <div class="desc">${b.desc||''}</div>
+    ${award}
+    <div class="foot"><span class="abv">${b.abv||''} ABV</span>${pill}</div>
+  </div>`;
+}
+
+function slugify(s){ return (s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,''); }
+function rand(seed){ const x=Math.sin(seed*99.13)*10000; return x-Math.floor(x); }
+
+function layoutPile(){
+  const pile=document.getElementById('pile');
+  const note=document.getElementById('pile-note'), moreBtn=document.getElementById('moreBtn');
+  const W=pile.clientWidth||900;
+  const total=GAL.length;
+  if(!total){ pile.innerHTML=''; pile.style.height='0px'; if(moreBtn)moreBtn.style.display='none'; if(note)note.textContent=''; return; }
+  if(pilePage>=pilePages()) pilePage=0;
+  const start=pilePage*PILE_SIZE;
+  const count=Math.min(PILE_SIZE, total-start);
+  // absolute indices for this page (clean batches of 30; last page shows the remainder)
+  const idxs=[]; for(let k=0;k<count;k++) idxs.push(start+k);
+  // Columns sized so photos are cell-sized and overlap, covering the area evenly.
+  const cols = W<560?3:(W<980?4:5);
+  const rows = Math.ceil(count/cols);
+  const cellW = W/cols;
+  const cellH = cellW*0.82;                 // rows overlap vertically too
+  const H = Math.round(rows*cellH + cellH*0.35);
+  pile.style.height = H+'px';
+  const lastRowCount = count - (rows-1)*cols;
+  pile.innerHTML = idxs.map((gi,k)=>{
+    const g=GAL[gi];
+    const s=k+start;
+    const r1=rand(s+1), r2=rand(s+7), r3=rand(s+13), r4=rand(s+23);
+    const row=Math.floor(k/cols), col=k%cols;
+    const inLast = row===rows-1 && lastRowCount<cols;
+    const perRow = inLast ? lastRowCount : cols;
+    const step = W/perRow;
+    const size = Math.round(cellW*(0.96 + r4*0.42));   // ~cell-sized → overlaps neighbours
+    let cx = col*step + step/2 + (r1-0.5)*step*0.5;
+    let cy = row*cellH + cellH/2 + (r2-0.5)*cellH*0.5;
+    let left = Math.round(Math.max(-size*0.06, Math.min(W-size*0.94, cx-size/2)));
+    let top  = Math.round(Math.max(0, Math.min(H-size, cy-size/2)));
+    const rot=(r3-0.5)*34, z=Math.round(r3*100);
+    return `<div class="photo" style="left:${left}px;top:${top}px;width:${size}px;height:${size}px;transform:rotate(${rot}deg);z-index:${z}"
+      onclick="openLB(${gi})" onmouseenter="this.style.transform='rotate(0deg) scale(1.06)'" onmouseleave="this.style.transform='rotate(${rot}deg)'">
+      <div class="ph" style="background-image:url('${g.img}')"></div></div>`;
+  }).join('');
+  if(note) note.textContent = total>PILE_SIZE ? `Showing ${start+1}–${start+count} of ${total} · batch ${pilePage+1}/${pilePages()} — tap a photo, or load more` : 'Tap a photo to take a closer look ✦';
+  if(moreBtn) moreBtn.style.display = total>PILE_SIZE ? 'inline-flex' : 'none';
+}
+function morePhotos(){ if(!GAL.length) return; pilePage=(pilePage+1)%pilePages(); layoutPile(); document.getElementById('gallery').scrollIntoView({behavior:'smooth',block:'start'}); }
+
+function render(){
+  const d=getData();
+  MANUAL=d.gallery||[]; GAL=MANUAL.slice(); QUOTES=d.quotes||[];
+  document.getElementById('tap-grid').innerHTML = (d.beers||[]).map(beerCard).join('');
+  document.getElementById('seltzer-grid').innerHTML = (d.seltzers||[]).map(beerCard).join('');
+  document.getElementById('pizza-grid').innerHTML = (d.pizzas||[]).map(p=>`
+    <div class="pizza"><div class="img">${p.img?`<img src="${p.img}" alt="${p.name}">`:''}</div>
+      <div class="body"><h3>${p.name}</h3><p>${p.desc||''}</p></div></div>`).join('');
+  pilePage=0;
+  layoutPile();
+  loadAlbumPhotos();   // pull iCloud shared album if configured; merges with manual uploads
+  document.getElementById('events-list').innerHTML = (d.events||[]).map(e=>`
+    <a class="event" href="event.html?id=${encodeURIComponent(e.id||slugify(e.title))}"><div class="date-chip"><div class="mo">${e.month}</div><div class="day">${e.day}</div></div>
+      <div class="info"><h3>${e.title}</h3><div class="when">${e.when||''}</div><div class="blurb">${e.blurb||''}</div></div>
+      <div class="go">View →</div></a>`).join('');
+  // "Tonight" = events whose month+day match today's date. Hidden if none.
+  const MONTHS=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+  const now=new Date();
+  const todays=(d.events||[]).filter(e=> (e.month||'').trim().toUpperCase()===MONTHS[now.getMonth()] && parseInt(e.day,10)===now.getDate());
+  const wrap=document.getElementById('tonight-wrap');
+  if(todays.length){
+    wrap.style.display='';
+    document.getElementById('hero-tonight').textContent = todays.map(e=>{
+      const t=(e.when||'').split('·').pop().trim();
+      return e.title + (t? ' · '+t : '');
+    }).join('  •  ');
+  } else {
+    wrap.style.display='none';
+  }
+  document.getElementById('hours-list').innerHTML = (d.hours||[]).map(h=>`
+    <div class="hours-row"><span class="d">${h.d}</span><span class="h">${h.h}</span></div>`).join('');
+  setOpenStatus(d.hours||[]);
+
+  const posterEl=document.getElementById('film-poster');
+  if(VIDEO_URL){
+    document.getElementById('film').insertAdjacentHTML('afterbegin',
+      `<video class="media" autoplay muted loop playsinline poster="${FILM_POSTER}"><source src="${VIDEO_URL}" type="video/mp4"></video>`);
+    posterEl.style.display='none';
+  } else { posterEl.style.backgroundImage=`url('${FILM_POSTER}')`; }
+
+  qIndex = QUOTES.length ? (Math.floor(Date.now()/3600000)%QUOTES.length) : 0;
+  showQuote();
+}
+
+function showQuote(){
+  const q=QUOTES[qIndex]; if(!q)return;
+  const t=document.getElementById('q-text'), by=document.getElementById('q-by'), src=document.getElementById('q-src');
+  t.style.opacity=0; by.style.opacity=0;
+  setTimeout(()=>{ t.textContent=q.text; by.textContent='— '+(q.by||''); src.textContent=q.src||''; t.style.opacity=1; by.style.opacity=1; },180);
+}
+function nextQuote(){ if(!QUOTES.length)return; qIndex=(qIndex+1)%QUOTES.length; showQuote(); }
+setInterval(()=>{ if(!QUOTES.length)return; const i=Math.floor(Date.now()/3600000)%QUOTES.length; if(i!==qIndex){qIndex=i;showQuote();} },60000);
+
+// Pull photos from the iCloud shared album via /api/photos (Vercel function).
+// Album photos show first, then any manually-uploaded ones. Falls back silently
+// to manual-only when running locally or before the album link is set.
+async function loadAlbumPhotos(){
+  try{
+    const album=(getData().settings&&getData().settings.albumUrl||'').trim();
+    const url=album ? '/api/photos?album='+encodeURIComponent(album) : '/api/photos';
+    const r=await fetch(url,{cache:'no-store'});
+    if(!r.ok) return;
+    const j=await r.json();
+    if(j && j.photos && j.photos.length){
+      GAL=[...j.photos, ...MANUAL];
+      layoutPile();
+    }
+  }catch(e){ /* offline / not deployed yet — keep manual photos */ }
+}
+
+let lbIndex=0;
+function openLB(i){ lbIndex=i; showLB(); document.getElementById('lightbox').classList.add('open'); }
+function showLB(){ const g=GAL[lbIndex]; if(!g)return; document.getElementById('lb-img').src=g.img; document.getElementById('lb-cap').textContent=g.cap||''; }
+function stepLB(n){ lbIndex=(lbIndex+n+GAL.length)%GAL.length; showLB(); }
+function closeLB(){ document.getElementById('lightbox').classList.remove('open'); }
+document.addEventListener('keydown',e=>{ if(!document.getElementById('lightbox').classList.contains('open'))return; if(e.key==='Escape')closeLB(); if(e.key==='ArrowRight')stepLB(1); if(e.key==='ArrowLeft')stepLB(-1); });
+document.getElementById('lightbox').addEventListener('click',e=>{ if(e.target.id==='lightbox')closeLB(); });
+
+// Live "Open now / Closed" badge computed from the hours in the admin
+function setOpenStatus(hours){
+  const dot=document.getElementById('open-dot'), txt=document.getElementById('open-text');
+  if(!dot||!txt) return;
+  const dayIdx=(s)=>({sun:0,mon:1,tue:2,wed:3,thu:4,fri:5,sat:6})[s.trim().toLowerCase().slice(0,3)];
+  function daysFor(d){
+    d=(d||'').toLowerCase();
+    if(/–|-| to /.test(d)){
+      const p=d.split(/–|-| to /).map(x=>x.trim()).filter(Boolean);
+      let a=dayIdx(p[0]), b=dayIdx(p[p.length-1]); if(a==null||b==null) return [];
+      const out=[]; let i=a; for(let n=0;n<8;n++){ out.push(i); if(i===b)break; i=(i+1)%7; } return out;
+    }
+    return d.split(',').map(x=>dayIdx(x)).filter(x=>x!=null);
+  }
+  const parseMin=(t)=>{ const m=(t||'').match(/(\d{1,2}):(\d{2})\s*([ap]m)/i); if(!m) return null; let h=(+m[1])%12; if(/pm/i.test(m[3])) h+=12; return h*60+(+m[2]); };
+  const now=new Date(), di=now.getDay(), mins=now.getHours()*60+now.getMinutes();
+  let entry=null; for(const e of hours){ if(daysFor(e.d).includes(di)){ entry=e; break; } }
+  let open=false, label='El Segundo, CA';
+  if(entry){
+    const p=(entry.h||'').split(/–|-|to/).map(x=>x.trim());
+    let o=parseMin(p[0]), c=parseMin(p[1]); if(c!=null&&o!=null&&c<=o) c+=1440;
+    if(o!=null&&c!=null){
+      if(mins>=o && mins<c){ open=true; label='Open now · til '+p[1]; }
+      else if(mins<o){ label='Opens '+p[0]+' today'; }
+      else label='Closed now';
+    }
+  } else { label='Closed today'; }
+  txt.textContent = label + (open || /Open|Opens|Closed/.test(label) ? ' · El Segundo' : '');
+  dot.style.background = open ? 'var(--teal)' : '#c98b6b';
+  dot.style.boxShadow = open ? '0 0 0 4px rgba(107,155,141,.22)' : '0 0 0 4px rgba(201,139,107,.18)';
+}
+
+// Age gate: remember for 24 hours once confirmed (also checked inline right after the gate markup)
+function passGate(){ try{ localStorage.setItem('fpf_age_ok', Date.now()); }catch(e){} document.getElementById('agegate').style.display='none'; }
+document.getElementById('yr').textContent=new Date().getFullYear();
+boot();
+let _rt; window.addEventListener('resize',()=>{ clearTimeout(_rt); _rt=setTimeout(layoutPile,200); });
+window.addEventListener('storage', ()=>{ SITE=null; render(); });
+</script>
+<script>
+/* privacy-light analytics beacon — one ping per page load */
+(function(){try{
+  var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);}
+  var ua=navigator.userAgent||''; var d=/iPad|Tablet/i.test(ua)?'Tablet':(/Mobi|Android|iPhone/i.test(ua)?'Mobile':'Desktop');
+  var ref=''; try{ if(document.referrer){ var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) ref=h; } }catch(e){}
+  fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({path:location.pathname,visitor:v,device:d,referrer:ref})}).catch(function(){});
+}catch(e){}})();
+</script>
+</body>
+</html>

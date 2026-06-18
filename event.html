@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Event — Five Point Five Brewing Co</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --paper:#f1e8d6;--paper-deep:#e7dcc4;--card:#fbf6ea;--ink:#3a2f24;--ink-soft:#5b4d3c;
+    --muted:#8a7b64;--line:#dccfb4;--terra:#c2744f;--teal:#6b9b8d;--ochre:#cba23f;--radius:14px;--maxw:880px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;position:relative}
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.45;mix-blend-mode:multiply;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/></svg>");}
+  .above{position:relative;z-index:2}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .display{font-family:'Anton',sans-serif;font-weight:400;letter-spacing:.5px;line-height:1;text-transform:uppercase}
+  .eyebrow{font-size:12.5px;letter-spacing:3.5px;text-transform:uppercase;color:var(--terra);font-weight:700}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:none;transition:transform .15s,background .15s,color .15s}
+  .btn-primary{background:var(--terra);color:#fff7ee}
+  .btn-primary:hover{background:#a95f3d;transform:translateY(-2px)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper)}
+
+  header.nav{position:sticky;top:0;z-index:900;background:rgba(241,232,214,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px;max-width:1140px;margin:0 auto;padding:0 24px}
+  .nav-logo{display:inline-flex;align-items:center}
+  .nav-logo img{height:40px;display:block}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{font-weight:600;font-size:15px;color:var(--ink-soft)}
+  .nav-links a:hover{color:var(--terra)}
+  @media(max-width:720px){ .nav-links{display:none} }
+
+  .back{display:inline-flex;align-items:center;gap:7px;color:var(--terra);font-weight:700;font-size:14px;margin:30px 0 14px}
+  .ev-head{display:flex;gap:22px;align-items:flex-start;flex-wrap:wrap}
+  .date-chip{text-align:center;border:1px solid var(--line);background:var(--card);border-radius:14px;padding:12px 18px;flex:none}
+  .date-chip .mo{font-size:13px;letter-spacing:2px;text-transform:uppercase;color:var(--terra);font-weight:800}
+  .date-chip .day{font-family:'Anton',sans-serif;font-size:46px;line-height:.9}
+  .ev-head h1{font-size:clamp(32px,6vw,58px);margin:2px 0 6px}
+  .ev-when{color:var(--ink-soft);font-weight:600;font-size:16px}
+  .ev-loc{color:var(--muted);font-size:14px;margin-top:4px}
+
+  .media{margin:30px 0;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--card);box-shadow:0 10px 30px rgba(58,47,36,.08)}
+  .media img{width:100%;display:block}
+  .media video{width:100%;display:block;background:#000}
+  .media .embed{position:relative;padding-top:56.25%}
+  .media .embed iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+
+  .body-text{font-size:18px;color:var(--ink-soft);white-space:pre-line;margin-bottom:30px}
+  .cta-row{display:flex;gap:14px;flex-wrap:wrap;margin:10px 0 80px}
+
+  .notfound{text-align:center;padding:90px 0}
+  .notfound h1{font-size:clamp(30px,6vw,52px);margin-bottom:14px}
+  .notfound p{color:var(--muted);margin-bottom:26px}
+
+  footer{background:var(--ink);color:var(--paper);padding:40px 0;position:relative;z-index:2}
+  .copy{max-width:1140px;margin:0 auto;padding:0 24px;color:#c9bca6;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .copy a{color:var(--ochre)}
+</style>
+</head>
+<body>
+
+<header class="nav above">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html"><img src="assets/logo-dark.png" alt="Five Point Five Brewing Co" /></a>
+    <nav class="nav-links">
+      <a href="index.html#tap">Beer</a><a href="index.html#pizza">Pizza</a><a href="index.html#gallery">Photos</a><a href="index.html#events">Events</a><a href="reservations.html">Reserve</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap above" id="content"><!-- injected --></div>
+
+<footer>
+  <div class="copy">
+    <span>© <span id="yr"></span> Five Point Five Brewing Co · 137 Nevada St, El Segundo</span>
+    <span><a href="index.html#events">← All events</a></span>
+  </div>
+</footer>
+
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+const DEFAULT_EVENTS=[
+  {id:"trivia-mc-ken", month:"JUN", day:"18", title:"Trivia Night with MC Ken", when:"Thursday · 7:00 PM", body:"Now every Thursday at Five Point Five @ 7pm — trivia with MC Ken. It's free to play; register your team to get invited to live cash tournaments. Grab a pizza, grab a pint, and put your useless knowledge to good use.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1702238798810-5AOI3MM3TJKEEUYPVCLS/Trivia_with_MC_Ken.png", video:"", link:"https://forms.gle/dd1kB4B78PV4tRMU7", linkLabel:"Register your team", reserveBtn:false},
+  {id:"world-cup-usa-australia", month:"JUN", day:"19", title:"World Cup — USA vs Australia", when:"Friday · 12:00 PM", body:"World Cup action on every screen with sound. Join us for beer and food specials throughout the match. Come early for a good seat — or reserve a table so your whole crew is set.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
+  {id:"world-cup-usa-turkiye", month:"JUN", day:"25", title:"World Cup — USA vs Türkiye", when:"Thursday · 7:00 PM", body:"Back-patio World Cup party on two big screens with sound, plus a bar in the back so you never miss a second. Beer and food specials all match long.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
+  {id:"pongs-and-pints", month:"JUL", day:"01", title:"Pongs & Pints — Filipino Mahjong", when:"Wednesday · 6:00 PM", body:"Join us for a night of Filipino Mahjong. New to the game? Teachers are on hand to show you the ropes. All skill levels welcome — we'll match you with the right table. Grab your spot and enjoy gameplay with a pint in hand.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757005326187-KYTEGI5KF5Y722ZO5FR2/IMG_4686.jpg", video:"", link:"", linkLabel:"", reserveBtn:true}
+];
+const slugify=(s)=>(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const esc=(s)=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+function getId(){ return new URLSearchParams(location.search).get('id')||''; }
+
+async function getEvents(){
+  // live content first, then local draft, then built-in defaults
+  try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&j.data.events&&j.data.events.length) return j.data.events; } }catch(e){}
+  try{ const s=localStorage.getItem('fpf_site_data'); if(s){ const d=JSON.parse(s); if(d.events&&d.events.length) return d.events; } }catch(e){}
+  return DEFAULT_EVENTS;
+}
+
+function mediaHTML(ev){
+  const v=(ev.video||'').trim();
+  if(v){
+    const yt=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+    if(yt) return `<div class="media"><div class="embed"><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe></div></div>`;
+    if(/\.(mp4|webm|mov)(\?|$)/i.test(v)) return `<div class="media"><video controls playsinline poster="${esc(ev.img)}"><source src="${esc(v)}"></video></div>`;
+    return `<div class="media"><div class="embed"><iframe src="${esc(v)}" allowfullscreen></iframe></div></div>`;
+  }
+  if(ev.img) return `<div class="media"><img src="${esc(ev.img)}" alt="${esc(ev.title)}"></div>`;
+  return '';
+}
+
+async function render(){
+  const id=getId();
+  const events=await getEvents();
+  const ev=events.find(e=>(e.id&&e.id===id)) || events.find(e=>slugify(e.title)===id);
+  const el=document.getElementById('content');
+  if(!ev){
+    el.innerHTML=`<div class="notfound"><h1 class="display">Event not found</h1><p>This event may have ended or moved.</p><a class="btn btn-primary" href="index.html#events">See all events</a></div>`;
+    document.title='Event not found — Five Point Five';
+    return;
+  }
+  document.title=`${ev.title} — Five Point Five Brewing Co`;
+  const signup = ev.link ? `<a class="btn btn-primary" href="${esc(ev.link)}" ${/^https?:/.test(ev.link)?'target="_blank" rel="noopener"':''}>${esc(ev.linkLabel||'Sign up')} →</a>` : '';
+  const reserve = ev.reserveBtn ? `<a class="btn ${ev.link?'btn-ghost':'btn-primary'}" href="reservations.html">Make a Reservation</a>` : '';
+  const ctaRow = (signup||reserve) ? `<div class="cta-row">${signup}${reserve}</div>` : '';
+  el.innerHTML=`
+    <a class="back" href="index.html#events">‹ All events</a>
+    <div class="ev-head">
+      <div class="date-chip"><div class="mo">${esc(ev.month)}</div><div class="day">${esc(ev.day)}</div></div>
+      <div>
+        <span class="eyebrow">Event</span>
+        <h1 class="display">${esc(ev.title)}</h1>
+        <div class="ev-when">${esc(ev.when||'')}</div>
+        <div class="ev-loc">Five Point Five Brewing Co · 137 Nevada St, El Segundo</div>
+      </div>
+    </div>
+    ${mediaHTML(ev)}
+    <div class="body-text">${esc(ev.body||ev.blurb||'')}</div>
+    ${ctaRow}`;
+}
+render();
+</script>
+<script>
+(function(){try{
+  var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);}
+  var ua=navigator.userAgent||''; var d=/iPad|Tablet/i.test(ua)?'Tablet':(/Mobi|Android|iPhone/i.test(ua)?'Mobile':'Desktop');
+  var ref=''; try{ if(document.referrer){ var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) ref=h; } }catch(e){}
+  fetch('/api/track',{method:'POST',headers:{'Content-Type':'application/json'},keepalive:true,body:JSON.stringify({path:location.pathname,visitor:v,device:d,referrer:ref})}).catch(function(){});
+}catch(e){}})();
+</script>
+</body>
+</html>

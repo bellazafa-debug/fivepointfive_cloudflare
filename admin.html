@@ -1,0 +1,484 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Five Point Five — Site Manager</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{
+    --bg:#f1e8d6;--bg-2:#e7dcc4;--card:#fbf6ea;--line:#d9ccb2;
+    --ink:#3a2f24;--muted:#8a7b64;--amber:#cf7a55;--amber-2:#c06c47;--red:#cf7a55;--teal:#6fa596;--radius:14px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--bg);color:var(--ink);font-family:'Inter',system-ui,sans-serif;line-height:1.5}
+  a{color:var(--amber)}
+  .display{font-family:'Anton',sans-serif;text-transform:uppercase;letter-spacing:.5px}
+  .wrap{max-width:1000px;margin:0 auto;padding:0 22px}
+
+  /* gate */
+  #gate{position:fixed;inset:0;z-index:50;background:var(--bg);display:flex;align-items:center;justify-content:center;padding:24px}
+  #gate .box{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:40px;max-width:380px;width:100%;text-align:center}
+  #gate img{width:70px;margin:0 auto 18px}
+  #gate h1{font-size:26px;margin-bottom:6px}
+  #gate p{color:var(--muted);font-size:14px;margin-bottom:22px}
+
+  header.top{border-bottom:1px solid var(--line);background:var(--bg-2);position:sticky;top:0;z-index:20}
+  .top-inner{display:flex;align-items:center;justify-content:space-between;height:66px}
+  .brand{display:flex;align-items:center;gap:12px}
+  .brand img{height:30px;filter:invert(18%) sepia(20%) saturate(700%) hue-rotate(350deg) brightness(60%)}
+  .brand .tagword{font-size:12px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);font-weight:700}
+  .top-actions{display:flex;gap:10px;align-items:center}
+
+  .tabs{display:flex;gap:6px;border-bottom:1px solid var(--line);margin-top:26px;flex-wrap:wrap}
+  .tab{padding:12px 20px;cursor:pointer;font-weight:700;font-size:14px;color:var(--muted);border-bottom:2px solid transparent;background:none;border-top:none;border-left:none;border-right:none}
+  .tab.active{color:var(--ink);border-bottom-color:var(--amber)}
+
+  .panel{padding:28px 0 80px}
+  .panel-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px;flex-wrap:wrap;gap:12px}
+  .panel-head h2{font-size:30px}
+  .panel-head p{color:var(--muted);font-size:14px}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);padding:18px 20px;margin-bottom:14px}
+  .card-row{display:flex;gap:14px;align-items:flex-start}
+  .card-row .grow{flex:1}
+  .row-title{font-weight:800;font-size:16px}
+  .row-sub{color:var(--muted);font-size:13px;margin-top:2px}
+  .drag{color:var(--muted);cursor:grab;font-size:18px;user-select:none;padding-top:2px}
+  .drag:active{cursor:grabbing}
+  .card.dragging{opacity:.45}
+  .card.drop-target{border-color:var(--amber);box-shadow:0 0 0 2px rgba(194,116,79,.25)}
+
+  .fields{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+  .fields.one{grid-template-columns:1fr}
+  label{display:block;font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+  input,textarea,select{width:100%;background:var(--bg);border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:11px 13px;font-family:inherit;font-size:14px}
+  input:focus,textarea:focus{outline:none;border-color:var(--amber)}
+  textarea{resize:vertical;min-height:60px}
+
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:11px 20px;border-radius:999px;font-weight:700;font-size:14px;cursor:pointer;border:none;transition:.15s}
+  .btn-primary{background:var(--amber);color:#fff7ee}
+  .btn-primary:hover{background:var(--amber-2)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--line)}
+  .btn-ghost:hover{border-color:var(--amber)}
+  .btn-sm{padding:8px 14px;font-size:13px}
+  .btn-danger{background:transparent;border:1.5px solid #5a2a22;color:#ff8a72}
+  .btn-danger:hover{border-color:var(--red);color:#fff;background:rgba(224,73,47,.15)}
+
+  .card-actions{display:flex;gap:8px;justify-content:flex-end;margin-top:14px}
+  .toast{position:fixed;bottom:22px;left:50%;transform:translateX(-50%) translateY(120%);background:var(--teal);color:#04221e;font-weight:700;padding:13px 22px;border-radius:12px;transition:transform .25s;z-index:60}
+  .toast.show{transform:translateX(-50%) translateY(0)}
+  .hint{background:rgba(245,165,36,.08);border:1px solid rgba(245,165,36,.3);border-radius:12px;padding:14px 16px;font-size:13px;color:var(--muted);margin-bottom:22px}
+  .hint b{color:var(--ink)}
+  @media(max-width:640px){.fields{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<!-- passcode gate (demo) -->
+<div id="gate">
+  <div class="box">
+    <img src="https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/89dfbb95-1764-4b6a-9569-8ce6cf9cf0ac/icon-cmyk.png?format=1500w" alt="logo" />
+    <h1 class="display">Site Manager</h1>
+    <p>Enter your team passcode to edit the website.</p>
+    <input id="pass" type="password" placeholder="Passcode" style="text-align:center;margin-bottom:12px" onkeydown="if(event.key==='Enter')tryPass()" />
+    <button class="btn btn-primary" style="width:100%;justify-content:center" onclick="tryPass()">Unlock</button>
+    <p style="margin-top:16px;font-size:12px;color:var(--muted)">Enter your team passcode to edit &amp; publish.</p>
+  </div>
+</div>
+
+<header class="top">
+  <div class="wrap top-inner">
+    <div class="brand">
+      <img src="https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/2b63efa4-828f-41bf-a826-b79e54054cf4/fivepointfive-horz-logo-white-wCity.png" alt="Five Point Five" />
+      <span class="tagword">Site Manager</span>
+    </div>
+    <div class="top-actions">
+      <a class="btn btn-ghost btn-sm" href="index.html" target="_blank">View site ↗</a>
+      <button class="btn btn-primary btn-sm" onclick="exportJSON()">Export JSON</button>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="tabs">
+    <button class="tab active" data-tab="beers" onclick="switchTab('beers')">🍺 Beer</button>
+    <button class="tab" data-tab="seltzers" onclick="switchTab('seltzers')">🥂 Seltzers</button>
+    <button class="tab" data-tab="pizzas" onclick="switchTab('pizzas')">🍕 Pizza</button>
+    <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
+    <button class="tab" data-tab="quotes" onclick="switchTab('quotes')">💬 Quotes</button>
+    <button class="tab" data-tab="events" onclick="switchTab('events')">📅 Events</button>
+    <button class="tab" data-tab="hours" onclick="switchTab('hours')">🕒 Hours</button>
+    <button class="tab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</button>
+  </div>
+
+  <div class="panel">
+    <div class="hint">✏️ <b>How this works:</b> edit anything, drag the ⋮⋮ handle to reorder, then click <b>💾 Publish changes</b> — it goes live for everyone. Any image field (beer logo, pizza, photo) has an <b>⬆ Upload</b> button to add a picture from your computer, or paste a URL. Add items with <b>+ Add new</b>, remove with the trash icon. No code, no Squarespace.</div>
+    <div id="albumBox" style="display:none;background:rgba(107,165,141,.1);border:1px solid rgba(107,165,141,.4);border-radius:12px;padding:16px 18px;margin-bottom:18px">
+      <div style="font-weight:700;margin-bottom:4px">📲 Auto-sync from an iCloud Shared Album</div>
+      <div style="font-size:13px;color:var(--muted);margin-bottom:10px">Paste your album's <b>Public Website</b> link and the photo wall fills itself (refreshes hourly). Photos you add below still show too. Leave blank to use manual photos only.</div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <input id="albumUrl" placeholder="https://www.icloud.com/sharedalbum/#B0..." style="flex:1;min-width:220px" />
+        <button class="btn btn-primary btn-sm" onclick="saveAlbum()">Save link</button>
+      </div>
+    </div>
+    <div class="panel-head">
+      <div>
+        <h2 class="display" id="panel-title">Beer & Seltzer</h2>
+        <p id="panel-desc">What's currently pouring. Shows in the "On Tap" section.</p>
+      </div>
+      <div style="display:flex;gap:10px" id="headBtns">
+        <input type="file" id="up" accept="image/*" multiple style="display:none" onchange="uploadPhotos(event)" />
+        <input type="file" id="fieldUp" accept="image/*" style="display:none" onchange="fieldUpload(event)" />
+        <button class="btn btn-ghost" id="upBtn" style="display:none" onclick="document.getElementById('up').click()">⬆ Upload photos</button>
+        <button class="btn btn-primary" onclick="addItem()">+ Add new</button>
+      </div>
+    </div>
+    <div id="list"></div>
+    <div id="analyticsPanel" style="display:none">
+      <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
+        <button class="btn btn-ghost btn-sm" onclick="loadStats(7)">7 days</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadStats(30)">30 days</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadStats(90)">90 days</button>
+        <button class="btn btn-ghost btn-sm" onclick="loadStats(365)">1 year</button>
+      </div>
+      <div id="statsBody" style="color:var(--muted)">Loading…</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Saved ✓</div>
+
+<script>
+const DEFAULT_DATA = {
+  beers:[
+    {name:"King Kölsch", type:"Kölsch", abv:"5.0%", desc:"Dry, crisp & refreshing with a pleasant hoppy bitterness.", tag:"🥉 2026 Cap Expo", logo:"assets/beer/king-kolsch.png"},
+    {name:"Amber Waves", type:"Amber Ale", abv:"4.9%", desc:"Light crisp malt, toasted caramel, slightly sweet finish.", tag:"", logo:"assets/beer/amber-waves.png"},
+    {name:"Citrus Aftermath", type:"Tropical IPA", abv:"6.6%", desc:"Juicy hops up front — grapefruit, pine & tropical fruit.", tag:"", logo:"assets/beer/citrus-aftermath.png"},
+    {name:"Hazy Daisy", type:"Hazy IPA", abv:"6.8%", desc:"Intense fruit flavor and aroma, soft body, smooth finish.", tag:"", logo:"assets/beer/hazy-daisy.png"},
+    {name:"Bungalow 304", type:"West Coast IPA", abv:"7.0%", desc:"A clean, well-balanced West Coast IPA.", tag:"", logo:"assets/beer/bungalow-304.png"},
+    {name:"Pacific Standard", type:"West Coast IPA", abv:"7.2%", desc:"Intense hoppiness with pine and citrus notes.", tag:"", logo:"assets/beer/pacific-standard.png"},
+    {name:"John Wit", type:"Belgian Wit", abv:"5.5%", desc:"Golden, slightly hazy; fresh wheat, coriander & orange peel.", tag:"", logo:"assets/beer/john-wit.png"},
+    {name:"Tank Farm", type:"Imperial Stout", abv:"10.0%", desc:"Full sweet malt — coffee, dark chocolate & burnt sugar.", tag:"🥉 2026 Brewers Cup", logo:"assets/beer/tank-farm.png"},
+    {name:"German Chocolate Cake", type:"Chocolate Stout", abv:"6.0%", desc:"Smooth chocolate with vanilla notes and cocoa nibs.", tag:"", logo:"assets/beer/german-chocolate-cake.png"}
+  ],
+  seltzers:[
+    {name:"Mango", type:"Hard Seltzer", abv:"5%", desc:"Bright, juicy mango. Crisp and clean.", tag:"Seltzer"},
+    {name:"Cherry", type:"Hard Seltzer", abv:"5%", desc:"Ripe dark cherry, lightly tart.", tag:"Seltzer"},
+    {name:"Capri Sun", type:"Hard Seltzer", abv:"5%", desc:"Tastes like the lunchbox classic, grown up.", tag:"Seltzer"},
+    {name:"Ube", type:"Hard Seltzer", abv:"5%", desc:"Filipino purple yam — smooth and a little nutty.", tag:"Seltzer"}
+  ],
+  pizzas:[
+    {name:"GTX Muscle Car", desc:"Fresh mozzarella, cupped pepperoni, fennel pollen sausage, roasted red onion. Cheese crust.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d8f386c7-f758-4661-8937-00df2e3a1430/GTX.png"},
+    {name:"Lil Red Corvette", desc:"Oven-sweetened cherry tomatoes, mozzarella, basil.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d37a70f8-2075-47cd-b890-55dea75d80b1/Corvette.png"},
+    {name:"Jeepney", desc:"Smoked Filipino sausage, onions & sweet peppers, ube yams, banana tomato sauce. Cheese crust.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d6e69a6f-b3eb-4cd6-8696-9cf6a942ba99/Jeepney.png"},
+    {name:"Opal GT", desc:"Jack & provolone, mozzarella, fontina, bechamel sauce.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/25f81f9e-9426-4e7b-aaf1-a419c440452a/Opal.png"},
+    {name:"VW Bus", desc:"Vegan harissa tomato sauce, olive mix and kale, roasted garlic eggplant.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/fe9944e0-3f7a-448b-bb97-6a4763a588d7/VW+Bus.png"}
+  ],
+  gallery:[
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"Golden hour"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Oktoberfest"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", cap:"World Cup patio"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757005326187-KYTEGI5KF5Y722ZO5FR2/IMG_4686.jpg", cap:"Mahjong night"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1770316497758-NRUJLVI3N7ORBSMVG6I2/superbowl-5.jpg", cap:"Big game Sunday"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757015828848-VIS77RP1ZQIU88VW5AGA/401772714.jpeg", cap:"NFL kickoff"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1773953806022-X2ED0IOV1KKJFZ161PXP/5.5+Karaoke.jpeg", cap:"First Friday karaoke"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1773951344346-W8RDPIGMLJL9DA6Q2Q0Z/braidsbeer.jpeg", cap:"Beers & braids"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/cb2ae6c5-2249-451c-803a-2e668ca95c4a/Sweet+Melissa+Art.png", cap:"Sweet Melissa"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"The taproom"}
+  ],
+  quotes:[
+    {text:"Best little brewery in El Segundo — the patio on a Friday is unbeatable.", by:"Yelp reviewer", src:"Yelp ★★★★★"},
+    {text:"The car-themed pizzas are no gimmick. The Jeepney is genuinely incredible.", by:"Google review", src:"Google ★★★★★"},
+    {text:"Trivia night is the highlight of our week. Feels like a neighborhood living room.", by:"A regular", src:"From the bar"},
+    {text:"Came for the seltzers, stayed for the people. This place just feels like home.", by:"Yelp reviewer", src:"Yelp ★★★★★"}
+  ],
+  events:[
+    {id:"trivia-mc-ken", month:"JUN", day:"18", title:"Trivia Night with MC Ken", when:"Thursday · 7:00 PM", blurb:"Free weekly trivia — join the league for cash tournaments.", body:"Now every Thursday at Five Point Five @ 7pm — trivia with MC Ken. It's free to play; register your team to get invited to live cash tournaments.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1702238798810-5AOI3MM3TJKEEUYPVCLS/Trivia_with_MC_Ken.png", video:"", link:"https://forms.gle/dd1kB4B78PV4tRMU7", linkLabel:"Register your team", reserveBtn:false},
+    {id:"world-cup-usa-australia", month:"JUN", day:"19", title:"World Cup — USA vs Australia", when:"Friday · 12:00 PM", blurb:"All screens, full sound, beer & food specials.", body:"World Cup action on every screen with sound. Join us for beer and food specials throughout the match.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
+    {id:"world-cup-usa-turkiye", month:"JUN", day:"25", title:"World Cup — USA vs Türkiye", when:"Thursday · 7:00 PM", blurb:"Back-patio party on two big screens.", body:"Back-patio World Cup party on two big screens with sound, plus a bar in the back so you never miss a second.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", video:"", link:"", linkLabel:"", reserveBtn:true},
+    {id:"pongs-and-pints", month:"JUL", day:"01", title:"Pongs & Pints — Filipino Mahjong", when:"Wednesday · 6:00 PM", blurb:"Learn or play — all skill levels welcome.", body:"Join us for a night of Filipino Mahjong. New to the game? Teachers are on hand to show you the ropes. All skill levels welcome.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757005326187-KYTEGI5KF5Y722ZO5FR2/IMG_4686.jpg", video:"", link:"", linkLabel:"", reserveBtn:true}
+  ],
+  hours:[
+    {d:"Monday – Thursday", h:"3:30 PM – 9:00 PM"},
+    {d:"Friday – Saturday", h:"12:00 PM – 10:00 PM"},
+    {d:"Sunday", h:"12:00 PM – 8:00 PM"}
+  ],
+  settings:{ albumUrl:"" }
+};
+
+// field schema per section: [key, label, type]
+const SCHEMA = {
+  beers:[["name","Name","input"],["type","Style (e.g. Hazy IPA)","input"],["abv","ABV (e.g. 6.8%)","input"],["tag","Badge — start with 🥇 🥈 🥉 for a medal (e.g. “🥉 2026 Cap Expo”), or plain text like “New”","input"],["logo","Logo image URL","input"],["desc","Description","textarea"]],
+  seltzers:[["name","Name","input"],["type","Type","input"],["abv","ABV","input"],["tag","Badge","input"],["desc","Description","textarea"]],
+  pizzas:[["name","Pizza name","input"],["img","Image URL","input"],["desc","Description","textarea"]],
+  gallery:[["cap","Caption","input"],["img","Image URL","input"]],
+  quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
+  events:[["month","Month (e.g. JUN)","input"],["day","Day (e.g. 18)","input"],["title","Event title","input"],["when","When (e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
+  hours:[["d","Days","input"],["h","Hours","input"]]
+};
+const TITLES = {
+  beers:["Beer","Your tap list. Shows in the \"Our Beers\" section. Edit any cell or add a new beer."],
+  seltzers:["Hard Seltzers","Shows under the seltzers row. Add or edit cells freely."],
+  pizzas:["Pi's by Pi LA","Your car-themed pies. Shows in the Pizza section."],
+  gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
+  quotes:["Quotes","Rotating reviews & quotes shown over the video. Changes hourly. Replace samples with your real Yelp/Google reviews."],
+  events:["Events","Each event gets its own page (photo, full text, sign-up link). Shows in the Events section; click-through opens the event page."],
+  hours:["Hours","Your weekly hours. Shows in Hours & Location."],
+  analytics:["Analytics","Traffic at a glance — views, unique visitors, devices and where people come from."]
+};
+const BLANK = {
+  beers:{name:"New beer",type:"",abv:"",tag:"",logo:"",desc:""},
+  seltzers:{name:"New seltzer",type:"Hard Seltzer",abv:"5%",tag:"Seltzer",desc:""},
+  pizzas:{name:"New pizza",img:"",desc:""},
+  gallery:{cap:"New photo",img:""},
+  quotes:{text:"New quote",by:"",src:""},
+  events:{month:"JAN",day:"1",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
+  hours:{d:"Day",h:"Hours"}
+};
+
+let data = loadLocal();
+let current = 'beers';
+let ADMIN_PW = '';
+
+function mergeDefaults(d){ for(const k in DEFAULT_DATA){ if(d[k]===undefined||d[k]===null) d[k]=JSON.parse(JSON.stringify(DEFAULT_DATA[k])); } return d; }
+function loadLocal(){ try{const s=localStorage.getItem('fpf_site_data'); if(s) return mergeDefaults(JSON.parse(s));}catch(e){} return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
+// Pull the live published content from the database so you're editing what's actually online.
+async function loadLive(){
+  try{ const r=await fetch('/api/content',{cache:'no-store'}); if(r.ok){ const j=await r.json(); if(j&&j.data&&Object.keys(j.data).length){ data=mergeDefaults(j.data); persist(); switchTab(current); } } }catch(e){}
+}
+function persist(){ try{ localStorage.setItem('fpf_site_data', JSON.stringify(data)); }catch(e){} }   // local draft
+
+function switchTab(t){
+  current=t;
+  document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
+  document.getElementById('panel-title').textContent=TITLES[t][0];
+  document.getElementById('panel-desc').textContent=TITLES[t][1];
+  const isA = (t==='analytics');
+  document.getElementById('analyticsPanel').style.display = isA ? 'block' : 'none';
+  document.getElementById('list').style.display = isA ? 'none' : 'block';
+  document.getElementById('headBtns').style.display = isA ? 'none' : 'flex';
+  document.getElementById('upBtn').style.display = (t==='gallery') ? 'inline-flex' : 'none';
+  const ab=document.getElementById('albumBox');
+  if(ab){ ab.style.display = (t==='gallery') ? 'block' : 'none';
+    if(t==='gallery'){ data.settings=data.settings||{albumUrl:''}; document.getElementById('albumUrl').value=data.settings.albumUrl||''; } }
+  if(isA){ loadStats(statsDays); return; }
+  renderList();
+}
+
+/* ---- Analytics ---- */
+let statsDays=30;
+function loadStats(days){
+  if(days) statsDays=days;
+  const body=document.getElementById('statsBody'); body.textContent='Loading…';
+  if(!ADMIN_PW){ body.textContent='Enter your passcode first.'; return; }
+  fetch('/api/stats',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:ADMIN_PW,days:statsDays})})
+    .then(r=>r.json())
+    .then(d=>{ if(!d||d.error){ body.innerHTML='<div style="color:#b4452f">Couldn’t load stats — check your passcode, or the site may not be deployed yet.</div>'; return; } renderStats(d); })
+    .catch(()=>{ body.innerHTML='<div style="color:var(--muted)">Analytics will appear once the site is live (it can’t run on the local file).</div>'; });
+}
+function renderStats(d){
+  const card='background:var(--card);border:1px solid var(--line);border-radius:12px;padding:16px';
+  const maxDay=Math.max(1,...((d.byDay||[]).map(x=>x.count)));
+  const bars=(d.byDay||[]).map(x=>`<div title="${x.day}: ${x.count}" style="flex:1;min-width:3px;height:${Math.max(2,Math.round(x.count/maxDay*108))}px;background:var(--amber);border-radius:3px 3px 0 0"></div>`).join('');
+  const devTotal=(d.byDevice||[]).reduce((a,x)=>a+x.count,0)||1;
+  const dev=(d.byDevice||[]).map(x=>`<div style="margin-bottom:9px"><div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:3px"><span>${x.device}</span><span>${Math.round(x.count/devTotal*100)}%</span></div><div style="height:8px;background:var(--line);border-radius:4px;overflow:hidden"><div style="width:${Math.round(x.count/devTotal*100)}%;height:100%;background:var(--teal)"></div></div></div>`).join('')||'<span style="color:var(--muted)">No data yet</span>';
+  const list=(arr,k)=> (arr&&arr.length)? arr.map(x=>`<div style="display:flex;justify-content:space-between;gap:10px;padding:7px 0;border-bottom:1px solid var(--line);font-size:13px"><span style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${(x[k]||'').toString().replace(/</g,'&lt;')}</span><b>${x.count}</b></div>`).join('') : '<span style="color:var(--muted)">No data yet</span>';
+  document.getElementById('statsBody').innerHTML=`
+    <div style="display:flex;gap:14px;flex-wrap:wrap;margin-bottom:22px">
+      <div style="flex:1;min-width:150px;${card}"><div style="font-size:32px;font-weight:800">${d.views||0}</div><div style="color:var(--muted);font-size:13px">Page views · last ${d.days} days</div></div>
+      <div style="flex:1;min-width:150px;${card}"><div style="font-size:32px;font-weight:800">${d.uniques||0}</div><div style="color:var(--muted);font-size:13px">Unique visitors</div></div>
+    </div>
+    <div style="font-weight:700;margin-bottom:8px">Views per day</div>
+    <div style="display:flex;align-items:flex-end;gap:3px;height:120px;${card};margin-bottom:22px">${bars||'<span style=\"color:var(--muted)\">No data yet</span>'}</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:22px">
+      <div><div style="font-weight:700;margin-bottom:10px">Devices</div>${dev}</div>
+      <div><div style="font-weight:700;margin-bottom:10px">Top pages</div>${list(d.topPaths,'path')}</div>
+    </div>
+    <div style="margin-top:22px"><div style="font-weight:700;margin-bottom:10px">Where visitors come from</div>${list(d.topRef,'ref')}</div>`;
+}
+async function saveAlbum(){
+  data.settings=data.settings||{albumUrl:''};
+  const link=document.getElementById('albumUrl').value.trim();
+  data.settings.albumUrl=link;
+  persist();
+  await saveAll();                 // publish so the live site actually gets the link
+  if(!link){ showToast('Album link cleared & published'); return; }
+  showToast('Checking album…');
+  try{
+    const r=await fetch('/api/photos?album='+encodeURIComponent(link),{cache:'no-store'});
+    const j=await r.json();
+    if(j && j.photos && j.photos.length) showToast('Album linked ✓ — found '+j.photos.length+' photos');
+    else if(j && j.error) showToast('Saved, but Apple returned an error — re-check the link');
+    else showToast('Saved, but 0 photos found — is the album set to “Public Website”?');
+  }catch(e){ showToast('Saved — album will load on the live site'); }
+}
+
+/* resize an uploaded image to a small JPEG data URL so it fits in storage */
+function resizeImg(file, max, cb){
+  const fr=new FileReader();
+  fr.onload=e=>{ const img=new Image(); img.onload=()=>{
+    let w=img.width, h=img.height; const sc=Math.min(1, max/Math.max(w,h));
+    const cw=Math.round(w*sc), ch=Math.round(h*sc);
+    const c=document.createElement('canvas'); c.width=cw; c.height=ch;
+    c.getContext('2d').drawImage(img,0,0,cw,ch);
+    cb(c.toDataURL('image/jpeg',0.82));
+  }; img.src=e.target.result; };
+  fr.readAsDataURL(file);
+}
+/* upload an image into a single field (beer logo, pizza image, etc.) */
+let fieldTarget=null;
+function pickField(i,k){ fieldTarget={i,k}; document.getElementById('fieldUp').click(); }
+function fieldUpload(ev){
+  const f=ev.target.files[0]; if(!f||!fieldTarget){ev.target.value='';return;}
+  resizeImg(f, 900, (dataUrl)=>{
+    data[current][fieldTarget.i][fieldTarget.k]=dataUrl;
+    try{ persist(); }catch(e){ showToast('Storage full — image too large'); }
+    renderList(); showToast('Image set ✓');
+  });
+  ev.target.value='';
+}
+function uploadPhotos(ev){
+  const files=[...ev.target.files]; if(!files.length)return;
+  let done=0;
+  files.forEach(f=>{
+    resizeImg(f, 1100, (dataUrl)=>{
+      data.gallery.unshift({img:dataUrl, cap:f.name.replace(/\.[^.]+$/,'')});
+      done++;
+      if(done===files.length){
+        try{ persist(); }catch(e){ showToast('Storage full — remove a few photos'); }
+        renderList(); showToast(done+' photo'+(done>1?'s':'')+' added ✓');
+      }
+    });
+  });
+  ev.target.value='';
+}
+
+function renderList(){
+  const items = data[current];
+  const schema = SCHEMA[current];
+  document.getElementById('list').innerHTML = items.map((item,i)=>{
+    const fields = schema.map(([key,label,type])=>{
+      const val = (item[key]||'').toString().replace(/"/g,'&quot;');
+      const isImg = (key==='img' || key==='logo');
+      let input;
+      if(isImg){
+        input = `<div style="display:flex;gap:8px;align-items:center">
+          ${item[key]?`<img src="${item[key]}" style="width:44px;height:44px;border-radius:8px;object-fit:contain;background:#fff;border:1px solid var(--line);flex:none">`:''}
+          <input data-i="${i}" data-k="${key}" value="${val}" placeholder="Paste URL or upload →" style="flex:1;min-width:0" />
+          <button type="button" class="btn btn-ghost btn-sm" style="flex:none" onclick="pickField(${i},'${key}')">⬆ Upload</button>
+        </div>`;
+      } else {
+        input = type==='textarea'
+          ? `<textarea data-i="${i}" data-k="${key}">${item[key]||''}</textarea>`
+          : `<input data-i="${i}" data-k="${key}" value="${val}" />`;
+      }
+      const wide = (type==='textarea' || key==='title' || key==='img' || key==='logo' || key==='link');
+      if(type==='checkbox'){
+        return `<div class="span2"><label style="display:flex;align-items:center;gap:10px;text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink);cursor:pointer;margin:0">
+          <input type="checkbox" data-i="${i}" data-k="${key}" data-type="checkbox" ${item[key]?'checked':''} style="width:18px;height:18px;flex:none"> ${label}</label></div>`;
+      }
+      return `<div class="${wide?'span2':''}"><label>${label}</label>${input}</div>`;
+    }).join('');
+    const titleKey = item.name || item.title || item.cap || (item.text? '“'+item.text.slice(0,40)+'…”' : '') || item.d || 'Untitled';
+    const sub = current==='events' ? `${item.month} ${item.day} · ${item.when||''}` : (item.type||item.desc||item.src||item.h||'').slice(0,70);
+    return `<div class="card" data-idx="${i}" draggable="false">
+      <div class="card-row">
+        <span class="drag" title="Drag to reorder">⋮⋮</span>
+        <div class="grow">
+          <div class="row-title">${titleKey||'Untitled'}</div>
+          <div class="row-sub">${sub}</div>
+          <div class="fields ${schema.length<3?'':''}">${fields}</div>
+        </div>
+      </div>
+      <div class="card-actions">
+        <button class="btn btn-danger btn-sm" onclick="removeItem(${i})">🗑 Remove</button>
+      </div>
+    </div>`;
+  }).join('') || `<div class="card" style="text-align:center;color:var(--muted)">Nothing here yet — click “Add new”.</div>`;
+
+  // wire inputs
+  document.querySelectorAll('#list [data-i]').forEach(el=>{
+    el.addEventListener('input', ()=>{
+      data[current][+el.dataset.i][el.dataset.k] = (el.dataset.type==='checkbox') ? el.checked : el.value;
+    });
+    el.addEventListener('change', ()=>{
+      data[current][+el.dataset.i][el.dataset.k] = (el.dataset.type==='checkbox') ? el.checked : el.value;
+    });
+  });
+  // make textarea/title fields span both columns
+  document.querySelectorAll('#list .span2').forEach(el=>el.style.gridColumn='1 / -1');
+  wireDrag();
+}
+
+// ---- drag to reorder ----
+let dragFrom=null;
+function wireDrag(){
+  document.querySelectorAll('#list .card[data-idx]').forEach(card=>{
+    const handle=card.querySelector('.drag');
+    if(handle){
+      handle.addEventListener('mousedown',()=>card.setAttribute('draggable','true'));
+      handle.addEventListener('mouseup',()=>card.setAttribute('draggable','false'));
+    }
+    card.addEventListener('dragstart',e=>{ dragFrom=+card.dataset.idx; card.classList.add('dragging'); e.dataTransfer.effectAllowed='move'; });
+    card.addEventListener('dragend',()=>{ card.classList.remove('dragging'); card.setAttribute('draggable','false'); document.querySelectorAll('#list .card').forEach(c=>c.classList.remove('drop-target')); });
+    card.addEventListener('dragover',e=>{ e.preventDefault(); e.dataTransfer.dropEffect='move'; card.classList.add('drop-target'); });
+    card.addEventListener('dragleave',()=>card.classList.remove('drop-target'));
+    card.addEventListener('drop',e=>{
+      e.preventDefault();
+      const to=+card.dataset.idx;
+      if(dragFrom!=null && dragFrom!==to){
+        const arr=data[current];
+        const moved=arr.splice(dragFrom,1)[0];
+        arr.splice(to,0,moved);
+        persist(); renderList(); showToast('Reordered ✓');
+      }
+      dragFrom=null;
+    });
+  });
+}
+
+function addItem(){ const it=JSON.parse(JSON.stringify(BLANK[current])); if(current==='events') it.id='evt-'+Date.now().toString(36); data[current].unshift(it); persist(); renderList(); showToast('Added — edit and save'); }
+function removeItem(i){ data[current].splice(i,1); persist(); renderList(); showToast('Removed ✓'); }
+
+// Publish the working copy to the live site (database).
+async function saveAll(){
+  persist();
+  if(location.protocol==='file:'){ showToast('This is the local file — open your LIVE site’s /admin to publish'); return; }
+  if(!ADMIN_PW){ showToast('Enter your passcode first'); return; }
+  const btn=document.getElementById('saveBtn'); if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
+  try{
+    const r=await fetch('/api/content',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:ADMIN_PW,data})});
+    if(r.ok){ showToast('Published live ✓ — everyone sees it now'); }
+    else if(r.status===401){ showToast('Wrong passcode — not published'); }
+    else if(r.status===404){ showToast('API not found (404) — functions didn’t deploy on the host'); }
+    else { showToast('Couldn’t publish ('+r.status+') — saved locally'); }
+  }catch(e){ showToast('Couldn’t reach /api/content — saved locally'); }
+  finally{ if(btn){ btn.disabled=false; btn.textContent='💾 Publish changes'; } }
+}
+
+function showToast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); clearTimeout(window._tt); window._tt=setTimeout(()=>t.classList.remove('show'),2200); }
+
+function exportJSON(){
+  const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download='content.json'; a.click();
+}
+
+function tryPass(){
+  const v=document.getElementById('pass').value.trim();
+  if(!v){ showToast('Enter your passcode'); return; }
+  ADMIN_PW=v;                                   // validated by the server when you Publish
+  document.getElementById('gate').style.display='none';
+}
+
+// floating Publish button
+const saveBar=document.createElement('div');
+saveBar.innerHTML='<button id="saveBtn" class="btn btn-primary" style="position:fixed;bottom:22px;right:22px;z-index:55;box-shadow:0 10px 30px rgba(0,0,0,.35)" onclick="saveAll()">💾 Publish changes</button>';
+document.body.appendChild(saveBar);
+
+switchTab('beers');
+loadLive();   // replace local draft with the live published content
+</script>
+</body>
+</html>
