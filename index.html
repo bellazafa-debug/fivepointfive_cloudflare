@@ -618,8 +618,8 @@ setInterval(()=>{ if(!QUOTES.length)return; const i=Math.floor(Date.now()/360000
 async function loadAlbumPhotos(){
   try{
     const album=(getData().settings&&getData().settings.albumUrl||'').trim();
-    const url=album ? '/api/photos?album='+encodeURIComponent(album) : '/api/photos';
-    const r=await fetch(url,{cache:'no-store'});
+    if(!album) return;
+    const r=await fetch(SB_URL+'/functions/v1/photos?album='+encodeURIComponent(album),{cache:'no-store'});
     if(!r.ok) return;
     const j=await r.json();
     if(j && j.photos && j.photos.length){

@@ -316,13 +316,13 @@ async function saveAlbum(){
   if(!link){ showToast('Album link cleared & published'); return; }
   showToast('Checking album…');
   try{
-    const r=await fetch('/api/photos?album='+encodeURIComponent(link),{cache:'no-store'});
+    const r=await fetch(SB_URL+'/functions/v1/photos?album='+encodeURIComponent(link),{cache:'no-store'});
     if(!r.ok) throw 0;
     const j=await r.json();
     if(j && j.photos && j.photos.length) showToast('Album linked ✓ — found '+j.photos.length+' photos');
     else if(j && j.error) showToast('Saved, but Apple returned an error — re-check the link');
     else showToast('Saved, but 0 photos found — is the album set to “Public Website”?');
-  }catch(e){ showToast('Saved ✓ (album auto-sync needs the API functions enabled)'); }
+  }catch(e){ showToast('Saved ✓ — couldn’t reach the photo service, try again'); }
 }
 
 /* resize an uploaded image to a small JPEG data URL so it fits in storage */
