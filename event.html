@@ -97,6 +97,8 @@ const DEFAULT_EVENTS=[
   {id:"pongs-and-pints", month:"JUL", day:"01", title:"Pongs & Pints — Filipino Mahjong", when:"Wednesday · 6:00 PM", body:"Join us for a night of Filipino Mahjong. New to the game? Teachers are on hand to show you the ropes. All skill levels welcome — we'll match you with the right table. Grab your spot and enjoy gameplay with a pint in hand.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/1757005326187-KYTEGI5KF5Y722ZO5FR2/IMG_4686.jpg", video:"", link:"", linkLabel:"", reserveBtn:true}
 ];
 const slugify=(s)=>(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const EV_MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function evChip(e){ if(e.date){const p=e.date.split('-');const d=new Date(+p[0],+p[1]-1,+p[2]);return {mo:EV_MO[d.getMonth()],day:d.getDate()};} return {mo:e.month||'',day:e.day||''}; }
 const esc=(s)=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
 function getId(){ return new URLSearchParams(location.search).get('id')||''; }
@@ -137,7 +139,7 @@ async function render(){
   el.innerHTML=`
     <a class="back" href="index.html#events">‹ All events</a>
     <div class="ev-head">
-      <div class="date-chip"><div class="mo">${esc(ev.month)}</div><div class="day">${esc(ev.day)}</div></div>
+      <div class="date-chip"><div class="mo">${esc(evChip(ev).mo)}</div><div class="day">${esc(evChip(ev).day)}</div></div>
       <div>
         <span class="eyebrow">Event</span>
         <h1 class="display">${esc(ev.title)}</h1>

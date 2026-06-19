@@ -109,6 +109,7 @@
     <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
     <button class="tab" data-tab="quotes" onclick="switchTab('quotes')">💬 Quotes</button>
     <button class="tab" data-tab="events" onclick="switchTab('events')">📅 Events</button>
+    <button class="tab" data-tab="pastevents" onclick="switchTab('pastevents')">🗂 Past Events</button>
     <button class="tab" data-tab="hours" onclick="switchTab('hours')">🕒 Hours</button>
     <button class="tab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</button>
   </div>
@@ -215,7 +216,7 @@ const SCHEMA = {
   pizzas:[["name","Pizza name","input"],["img","Image URL","input"],["desc","Description","textarea"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
-  events:[["month","Month (e.g. JUN)","input"],["day","Day (e.g. 18)","input"],["title","Event title","input"],["when","When (e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
+  events:[["date","Date","date"],["end","Ends at (optional — auto-hides after this time)","time"],["title","Event title","input"],["when","When (shown text, e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
   hours:[["d","Days","input"],["h","Hours","input"]]
 };
 const TITLES = {
@@ -224,19 +225,30 @@ const TITLES = {
   pizzas:["Pi's by Pi LA","Your car-themed pies. Shows in the Pizza section."],
   gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
   quotes:["Quotes","Rotating reviews & quotes shown over the video. Changes hourly. Replace samples with your real Yelp/Google reviews."],
-  events:["Events","Each event gets its own page (photo, full text, sign-up link). Shows in the Events section; click-through opens the event page."],
+  events:["Upcoming Events","Each event gets its own page. Once the date (and end time) passes, it moves to Past Events automatically."],
+  pastevents:["Past Events","Events that have ended. Hit ↻ Renew to set a new date and bring one back as upcoming."],
   hours:["Hours","Your weekly hours. Shows in Hours & Location."],
   analytics:["Analytics","Traffic at a glance — views, unique visitors, devices and where people come from."]
 };
+const SOURCE={ pastevents:'events' };
+const FILTER={ events:(e)=>!evPast(e), pastevents:(e)=>evPast(e) };
+function srcKey(){ return SOURCE[current]||current; }
+function curArr(){ return data[srcKey()]; }
 const BLANK = {
   beers:{name:"New beer",type:"",abv:"",tag:"",logo:"",desc:""},
   seltzers:{name:"New seltzer",type:"Hard Seltzer",abv:"5%",tag:"Seltzer",desc:""},
   pizzas:{name:"New pizza",img:"",desc:""},
   gallery:{cap:"New photo",img:""},
   quotes:{text:"New quote",by:"",src:""},
-  events:{month:"JAN",day:"1",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
+  events:{id:"",date:"",end:"",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
   hours:{d:"Day",h:"Hours"}
 };
+/* event date helpers (mirror of the homepage) */
+const EV_MO=['JAN','FEB','MAR','APR','MAY','JUN','JUL','AUG','SEP','OCT','NOV','DEC'];
+function evDateObj(e){ if(e.date){const p=e.date.split('-');return new Date(+p[0],+p[1]-1,+p[2]);} const m=EV_MO.indexOf((e.month||'').toUpperCase()); if(m<0)return null; return new Date(new Date().getFullYear(),m,parseInt(e.day,10)||1); }
+function evEnd(e){ const d=evDateObj(e); if(!d)return null; const t=(e.end||'23:59').split(':'); d.setHours(+t[0]||23,+t[1]||59,59,0); return d; }
+function evPast(e){ const end=evEnd(e); return end?Date.now()>end.getTime():false; }
+function evChip(e){ const d=evDateObj(e); if(d)return {mo:EV_MO[d.getMonth()],day:d.getDate()}; return {mo:e.month||'',day:e.day||''}; }
 
 let data = loadLocal();
 let current = 'beers';
@@ -267,7 +279,7 @@ function switchTab(t){
   const isA = (t==='analytics');
   document.getElementById('analyticsPanel').style.display = isA ? 'block' : 'none';
   document.getElementById('list').style.display = isA ? 'none' : 'block';
-  document.getElementById('headBtns').style.display = isA ? 'none' : 'flex';
+  document.getElementById('headBtns').style.display = (isA||t==='pastevents') ? 'none' : 'flex';
   document.getElementById('upBtn').style.display = (t==='gallery') ? 'inline-flex' : 'none';
   const ab=document.getElementById('albumBox');
   if(ab){ ab.style.display = (t==='gallery') ? 'block' : 'none';
@@ -366,9 +378,14 @@ function uploadPhotos(ev){
 }
 
 function renderList(){
-  const items = data[current];
-  const schema = SCHEMA[current];
+  const src = srcKey();
+  const items = data[src];
+  const schema = SCHEMA[src];
+  const filt = FILTER[current];
+  let shown=0;
   document.getElementById('list').innerHTML = items.map((item,i)=>{
+    if(filt && !filt(item)) return '';
+    shown++;
     const fields = schema.map(([key,label,type])=>{
       const val = (item[key]||'').toString().replace(/"/g,'&quot;');
       const isImg = (key==='img' || key==='logo');
@@ -379,10 +396,11 @@ function renderList(){
           <input data-i="${i}" data-k="${key}" value="${val}" placeholder="Paste URL or upload →" style="flex:1;min-width:0" />
           <button type="button" class="btn btn-ghost btn-sm" style="flex:none" onclick="pickField(${i},'${key}')">⬆ Upload</button>
         </div>`;
+      } else if(type==='textarea'){
+        input = `<textarea data-i="${i}" data-k="${key}">${item[key]||''}</textarea>`;
       } else {
-        input = type==='textarea'
-          ? `<textarea data-i="${i}" data-k="${key}">${item[key]||''}</textarea>`
-          : `<input data-i="${i}" data-k="${key}" value="${val}" />`;
+        const it = (type==='date')?'date':(type==='time')?'time':'text';
+        input = `<input type="${it}" data-i="${i}" data-k="${key}" value="${val}" />`;
       }
       const wide = (type==='textarea' || key==='title' || key==='img' || key==='logo' || key==='link');
       if(type==='checkbox'){
@@ -392,7 +410,9 @@ function renderList(){
       return `<div class="${wide?'span2':''}"><label>${label}</label>${input}</div>`;
     }).join('');
     const titleKey = item.name || item.title || item.cap || (item.text? '“'+item.text.slice(0,40)+'…”' : '') || item.d || 'Untitled';
-    const sub = current==='events' ? `${item.month} ${item.day} · ${item.when||''}` : (item.type||item.desc||item.src||item.h||'').slice(0,70);
+    const isEv = (src==='events');
+    const sub = isEv ? `${evChip(item).mo} ${evChip(item).day} · ${item.when||''}` : (item.type||item.desc||item.src||item.h||'').slice(0,70);
+    const renew = (current==='pastevents') ? `<button class="btn btn-ghost btn-sm" onclick="renewEvent(${i})">↻ Renew</button>` : '';
     return `<div class="card" data-idx="${i}" draggable="false">
       <div class="card-row">
         <span class="drag" title="Drag to reorder">⋮⋮</span>
@@ -403,19 +423,18 @@ function renderList(){
         </div>
       </div>
       <div class="card-actions">
+        ${renew}
         <button class="btn btn-danger btn-sm" onclick="removeItem(${i})">🗑 Remove</button>
       </div>
     </div>`;
-  }).join('') || `<div class="card" style="text-align:center;color:var(--muted)">Nothing here yet — click “Add new”.</div>`;
+  }).join('');
+  if(!shown){ document.getElementById('list').innerHTML = `<div class="card" style="text-align:center;color:var(--muted)">${current==='pastevents'?'No past events yet.':'Nothing here yet — click “Add new”.'}</div>`; }
 
   // wire inputs
   document.querySelectorAll('#list [data-i]').forEach(el=>{
-    el.addEventListener('input', ()=>{
-      data[current][+el.dataset.i][el.dataset.k] = (el.dataset.type==='checkbox') ? el.checked : el.value;
-    });
-    el.addEventListener('change', ()=>{
-      data[current][+el.dataset.i][el.dataset.k] = (el.dataset.type==='checkbox') ? el.checked : el.value;
-    });
+    const save=()=>{ data[srcKey()][+el.dataset.i][el.dataset.k] = (el.dataset.type==='checkbox') ? el.checked : el.value; };
+    el.addEventListener('input', save);
+    el.addEventListener('change', save);
   });
   // make textarea/title fields span both columns
   document.querySelectorAll('#list .span2').forEach(el=>el.style.gridColumn='1 / -1');
@@ -439,7 +458,7 @@ function wireDrag(){
       e.preventDefault();
       const to=+card.dataset.idx;
       if(dragFrom!=null && dragFrom!==to){
-        const arr=data[current];
+        const arr=curArr();
         const moved=arr.splice(dragFrom,1)[0];
         arr.splice(to,0,moved);
         persist(); renderList(); showToast('Reordered ✓');
@@ -449,8 +468,9 @@ function wireDrag(){
   });
 }
 
-function addItem(){ const it=JSON.parse(JSON.stringify(BLANK[current])); if(current==='events') it.id='evt-'+Date.now().toString(36); data[current].unshift(it); persist(); renderList(); showToast('Added — edit and save'); }
-function removeItem(i){ data[current].splice(i,1); persist(); renderList(); showToast('Removed ✓'); }
+function addItem(){ const src=srcKey(); const it=JSON.parse(JSON.stringify(BLANK[src])); if(src==='events') it.id='evt-'+Date.now().toString(36); data[src].unshift(it); persist(); renderList(); showToast('Added — edit and save'); }
+function removeItem(i){ curArr().splice(i,1); persist(); renderList(); showToast('Removed ✓'); }
+function renewEvent(i){ const ev=data.events[i]; if(!ev) return; ev.date=''; ev.month=''; ev.day=''; persist(); switchTab('events'); showToast('Moved to Upcoming — set a new date, then Publish'); }
 
 // Publish the working copy to the live site (database).
 async function saveAll(){
