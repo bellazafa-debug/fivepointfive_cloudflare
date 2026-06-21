@@ -135,7 +135,8 @@
   .merch{display:block;background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 0 var(--line)}
   .merch:hover{transform:translateY(-4px);box-shadow:0 14px 26px rgba(58,47,36,.14)}
   .merch .media{aspect-ratio:1/1;background:var(--paper-deep);display:flex;align-items:center;justify-content:center;overflow:hidden}
-  .merch .media img,.merch .media video,.merch .media iframe{width:100%;height:100%;object-fit:cover;display:block;border:0}
+  .merch .media img{width:100%;height:100%;object-fit:contain;display:block;padding:10px}
+  .merch .media video,.merch .media iframe{width:100%;height:100%;object-fit:cover;display:block;border:0}
   .merch .ph{color:var(--muted);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:8px}
   .merch .ph span{font-size:13px}
   .merch .ph b{font-size:32px}
@@ -427,6 +428,14 @@
   </div>
 </section>
 
+<!-- MERCH -->
+<section class="block above" id="merch">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Take some home</span><h2 class="display">Merch</h2></div></div>
+    <div class="merch-grid" id="merch-grid"></div>
+  </div>
+</section>
+
 <!-- EVENTS -->
 <section class="block above" id="events">
   <div class="wrap">
@@ -446,14 +455,6 @@
     <div class="pile" id="pile"></div>
     <div class="pile-note" id="pile-note">Tap a photo to take a closer look ✦</div>
     <div style="text-align:center;margin-top:14px"><button class="btn btn-ghost" id="moreBtn" style="display:none" onclick="morePhotos()">More photos →</button></div>
-  </div>
-</section>
-
-<!-- MERCH -->
-<section class="block above" id="merch">
-  <div class="wrap">
-    <div class="sec-head"><div><span class="eyebrow">Take some home</span><h2 class="display">Merch</h2></div></div>
-    <div class="merch-grid" id="merch-grid"></div>
   </div>
 </section>
 

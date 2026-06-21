@@ -35,7 +35,8 @@
   .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:start;padding-bottom:80px}
   /* carousel */
   .car{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
-  .car .slide{aspect-ratio:1/1;background:var(--paper-deep) center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+  .car .slide{background:var(--paper-deep);display:flex;align-items:center;justify-content:center;min-height:300px;padding:10px}
+  .car .slide img{width:100%;max-height:66vh;object-fit:contain;display:block}
   .car .ph{color:var(--muted);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
   .car .ph b{font-size:40px}
   .car .arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(58,47,36,.55);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -91,7 +92,7 @@ async function getMerch(){
 }
 let IMGS=[], cur=0;
 function show(i){ cur=(i+IMGS.length)%IMGS.length;
-  document.getElementById('slide').style.backgroundImage="url('"+IMGS[cur]+"')";
+  document.getElementById('slide-img').src=IMGS[cur];
   document.querySelectorAll('.dots span').forEach((s,k)=>s.classList.toggle('on',k===cur));
   document.querySelectorAll('.thumbs img').forEach((t,k)=>t.classList.toggle('on',k===cur));
 }
@@ -112,7 +113,7 @@ async function render(){
   const hasImgs=IMGS.length>0;
   const carousel = hasImgs ? `
     <div class="car">
-      <div class="slide" id="slide" style="background-image:url('${IMGS[0]}')"></div>
+      <div class="slide" id="slide"><img id="slide-img" src="${IMGS[0]}" alt=""></div>
       ${IMGS.length>1?`<button class="arrow prev" onclick="step(-1)">‹</button><button class="arrow next" onclick="step(1)">›</button>
       <div class="dots">${IMGS.map((_,k)=>`<span class="${k===0?'on':''}" onclick="show(${k})"></span>`).join('')}</div>`:''}
     </div>
@@ -129,7 +130,7 @@ async function render(){
         ${price?`<div class="price">${esc(price)}</div>`:''}
         <div class="desc">${esc(m.desc||'')}</div>
         ${videoHTML(m.video)}
-        <div class="cta-row">${buy}<a class="btn btn-ghost" href="index.html#visit">Find us in the taproom</a></div>
+        ${buy?`<div class="cta-row">${buy}</div>`:''}
       </div>
     </div>`;
   document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight')step(1); if(e.key==='ArrowLeft')step(-1); });
