@@ -134,6 +134,7 @@
       <div style="display:flex;gap:10px" id="headBtns">
         <input type="file" id="up" accept="image/*" multiple style="display:none" onchange="uploadPhotos(event)" />
         <input type="file" id="fieldUp" accept="image/*" style="display:none" onchange="fieldUpload(event)" />
+        <input type="file" id="merchUp" accept="image/*" multiple style="display:none" onchange="mImgUploaded(event)" />
         <button class="btn btn-ghost" id="upBtn" style="display:none" onclick="document.getElementById('up').click()">⬆ Upload photos</button>
         <button class="btn btn-primary" onclick="addItem()">+ Add new</button>
       </div>
@@ -199,10 +200,10 @@ const DEFAULT_DATA = {
     {name:"VW Bus", desc:"Vegan harissa tomato sauce, olive mix and kale, roasted garlic eggplant.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/fe9944e0-3f7a-448b-bb97-6a4763a588d7/VW+Bus.png"}
   ],
   merch:[
-    {name:"Five Point Five Tee", price:"$28", desc:"Soft tri-blend tee with our wordmark. Unisex sizing.", img:"", video:"", link:"", linkLabel:""},
-    {name:"Trucker Hat", price:"$26", desc:"Classic foam-front trucker with the 5.5 patch.", img:"", video:"", link:"", linkLabel:""},
-    {name:"Logo Pint Glass", price:"$12", desc:"16oz pint glass etched with the Five Point Five logo.", img:"", video:"", link:"", linkLabel:""},
-    {name:"Patio Hoodie", price:"$52", desc:"Heavyweight hoodie for cold patio nights.", img:"", video:"", link:"", linkLabel:""}
+    {name:"Five Point Five Tee", price:"$28", desc:"Soft tri-blend tee with our wordmark. Unisex sizing.", images:[], video:"", link:"", linkLabel:""},
+    {name:"Trucker Hat", price:"$26", desc:"Classic foam-front trucker with the 5.5 patch.", images:[], video:"", link:"", linkLabel:""},
+    {name:"Logo Pint Glass", price:"$12", desc:"16oz pint glass etched with the Five Point Five logo.", images:[], video:"", link:"", linkLabel:""},
+    {name:"Patio Hoodie", price:"$52", desc:"Heavyweight hoodie for cold patio nights.", images:[], video:"", link:"", linkLabel:""}
   ],
   gallery:[
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"Golden hour"},
@@ -241,7 +242,7 @@ const SCHEMA = {
   beers:[["name","Name","input"],["type","Style (e.g. Hazy IPA)","input"],["abv","ABV (e.g. 6.8%)","input"],["tag","Badge — start with 🥇 🥈 🥉 for a medal (e.g. “🥉 2026 Cap Expo”), or plain text like “New”","input"],["logo","Logo image URL","input"],["desc","Description","textarea"]],
   seltzers:[["name","Name","input"],["type","Type","input"],["abv","ABV","input"],["tag","Badge","input"],["desc","Description","textarea"]],
   pizzas:[["name","Pizza name","input"],["img","Image URL","input"],["desc","Description","textarea"]],
-  merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["img","Photo","input"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
+  merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["images","Photos (carousel — first one is the thumbnail)","images"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
   events:[["date","Date","date"],["end","Ends at (optional — auto-hides after this time)","time"],["title","Event title","input"],["when","When (shown text, e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
@@ -268,7 +269,7 @@ const BLANK = {
   beers:{name:"New beer",type:"",abv:"",tag:"",logo:"",desc:""},
   seltzers:{name:"New seltzer",type:"Hard Seltzer",abv:"5%",tag:"Seltzer",desc:""},
   pizzas:{name:"New pizza",img:"",desc:""},
-  merch:{name:"New item",price:"",desc:"",img:"",video:"",link:"",linkLabel:""},
+  merch:{name:"New item",price:"",desc:"",images:[],video:"",link:"",linkLabel:""},
   gallery:{cap:"New photo",img:""},
   quotes:{text:"New quote",by:"",src:""},
   events:{id:"",date:"",end:"",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
@@ -421,6 +422,19 @@ function fieldUpload(ev){
   });
   ev.target.value='';
 }
+/* merch carousel image management (per item) */
+let mImgTarget=null;
+function mImgUpload(i){ mImgTarget=i; document.getElementById('merchUp').click(); }
+function mImgUploaded(ev){
+  const files=[...ev.target.files]; const i=mImgTarget;
+  if(i==null||!files.length){ ev.target.value=''; return; }
+  const arr=data.merch[i].images || (data.merch[i].images=[]);
+  let done=0;
+  files.forEach(f=>resizeImg(f,1100,(d)=>{ arr.push(d); done++; if(done===files.length){ try{persist();}catch(e){showToast('Storage full');} renderList(); showToast(done+' photo'+(done>1?'s':'')+' added ✓'); } }));
+  ev.target.value='';
+}
+function mImgAddUrl(i){ const el=document.getElementById('mimgurl-'+i); const u=(el&&el.value||'').trim(); if(!u) return; (data.merch[i].images||(data.merch[i].images=[])).push(u); persist(); renderList(); showToast('Image added ✓'); }
+function mImgRemove(i,j){ const arr=data.merch[i].images||[]; arr.splice(j,1); persist(); renderList(); showToast('Removed ✓'); }
 function uploadPhotos(ev){
   const files=[...ev.target.files]; if(!files.length)return;
   let done=0;
@@ -448,6 +462,18 @@ function renderList(){
     shown++;
     const fields = schema.map(([key,label,type])=>{
       const val = (item[key]||'').toString().replace(/"/g,'&quot;');
+      if(type==='images'){
+        const imgs = item[key] || (item[key]=[]);
+        const thumbs = imgs.map((u,j)=>`<div style="position:relative;width:62px;height:62px;flex:none">
+          <img src="${u}" style="width:62px;height:62px;object-fit:cover;border-radius:9px;border:1px solid var(--line)">
+          <button type="button" title="Remove" onclick="mImgRemove(${i},${j})" style="position:absolute;top:-7px;right:-7px;width:20px;height:20px;border-radius:50%;border:none;background:#b4452f;color:#fff;font-size:12px;line-height:1;cursor:pointer">×</button></div>`).join('');
+        return `<div class="span2"><label>${label}</label>
+          <div style="display:flex;gap:9px;flex-wrap:wrap;align-items:center">${thumbs}
+            <button type="button" class="btn btn-ghost btn-sm" style="flex:none" onclick="mImgUpload(${i})">⬆ Upload</button></div>
+          <div style="display:flex;gap:8px;margin-top:8px">
+            <input id="mimgurl-${i}" placeholder="…or paste an image URL" style="flex:1;min-width:0" />
+            <button type="button" class="btn btn-ghost btn-sm" style="flex:none" onclick="mImgAddUrl(${i})">Add</button></div></div>`;
+      }
       const isImg = (key==='img' || key==='logo');
       let input;
       if(isImg){

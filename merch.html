@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Merch — Five Point Five Brewing Co</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Anton&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
+<style>
+  :root{--paper:#f1e8d6;--paper-deep:#e7dcc4;--card:#fbf6ea;--ink:#3a2f24;--ink-soft:#5b4d3c;--muted:#8a7b64;--line:#dccfb4;--terra:#c2744f;--ochre:#cba23f;--radius:14px;--maxw:1040px;}
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.6;position:relative}
+  body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.45;mix-blend-mode:multiply;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/></svg>");}
+  .above{position:relative;z-index:2}
+  a{color:inherit;text-decoration:none}
+  img{max-width:100%;display:block}
+  .wrap{max-width:var(--maxw);margin:0 auto;padding:0 24px}
+  .display{font-family:'Anton',sans-serif;text-transform:uppercase;line-height:1;letter-spacing:.5px}
+  .eyebrow{font-size:12.5px;letter-spacing:3.5px;text-transform:uppercase;color:var(--terra);font-weight:700}
+  .btn{display:inline-flex;align-items:center;justify-content:center;gap:9px;padding:14px 26px;border-radius:999px;font-weight:700;font-size:15px;cursor:pointer;border:none;transition:.15s}
+  .btn-primary{background:var(--terra);color:#fff7ee}
+  .btn-primary:hover{background:#a95f3d;transform:translateY(-2px)}
+  .btn-ghost{background:transparent;color:var(--ink);border:1.5px solid var(--ink)}
+  .btn-ghost:hover{background:var(--ink);color:var(--paper)}
+  header.nav{position:sticky;top:0;z-index:900;background:rgba(241,232,214,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+  .nav-inner{display:flex;align-items:center;justify-content:space-between;height:72px;max-width:1140px;margin:0 auto;padding:0 24px}
+  .nav-logo{display:inline-flex;align-items:center}
+  .nav-logo img{height:40px;display:block}
+  .nav-links{display:flex;align-items:center;gap:28px}
+  .nav-links a{font-weight:600;font-size:15px;color:var(--ink-soft)}
+  .nav-links a:hover{color:var(--terra)}
+  @media(max-width:720px){ .nav-links{display:none} }
+  .back{display:inline-flex;align-items:center;gap:7px;color:var(--terra);font-weight:700;font-size:14px;margin:30px 0 16px}
+  .grid{display:grid;grid-template-columns:1.1fr 1fr;gap:40px;align-items:start;padding-bottom:80px}
+  /* carousel */
+  .car{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:var(--card)}
+  .car .slide{aspect-ratio:1/1;background:var(--paper-deep) center/cover no-repeat;display:flex;align-items:center;justify-content:center}
+  .car .ph{color:var(--muted);font-size:14px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .car .ph b{font-size:40px}
+  .car .arrow{position:absolute;top:50%;transform:translateY(-50%);width:42px;height:42px;border-radius:50%;border:none;background:rgba(58,47,36,.55);color:#fff;font-size:22px;cursor:pointer;display:flex;align-items:center;justify-content:center}
+  .car .arrow:hover{background:rgba(58,47,36,.8)}
+  .car .prev{left:12px}.car .next{right:12px}
+  .car .dots{position:absolute;bottom:12px;left:0;right:0;display:flex;justify-content:center;gap:7px}
+  .car .dots span{width:8px;height:8px;border-radius:50%;background:rgba(255,255,255,.55);cursor:pointer}
+  .car .dots span.on{background:#fff}
+  .thumbs{display:flex;gap:10px;margin-top:12px;flex-wrap:wrap}
+  .thumbs img{width:62px;height:62px;object-fit:cover;border-radius:9px;border:2px solid transparent;cursor:pointer}
+  .thumbs img.on{border-color:var(--terra)}
+  .info .eyebrow{display:block;margin-bottom:8px}
+  .info h1{font-size:clamp(30px,5vw,48px);margin-bottom:10px}
+  .info .price{font-size:26px;font-weight:800;color:var(--terra);margin-bottom:18px}
+  .info .desc{font-size:17px;color:var(--ink-soft);white-space:pre-line;margin-bottom:26px}
+  .info .vid{margin:22px 0;border-radius:14px;overflow:hidden;border:1px solid var(--line)}
+  .info .vid video,.info .vid iframe{width:100%;display:block;border:0;aspect-ratio:16/9;background:#000}
+  .cta-row{display:flex;gap:12px;flex-wrap:wrap}
+  .notfound{text-align:center;padding:90px 0}
+  .notfound h1{font-size:clamp(30px,6vw,52px);margin-bottom:14px}
+  footer{background:var(--ink);color:var(--paper);padding:40px 0;position:relative;z-index:2;margin-top:20px}
+  .copy{max-width:1140px;margin:0 auto;padding:0 24px;color:#c9bca6;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
+  .copy a{color:var(--ochre)}
+  @media(max-width:760px){ .grid{grid-template-columns:1fr;gap:24px} }
+</style>
+</head>
+<body>
+<header class="nav above">
+  <div class="nav-inner">
+    <a class="nav-logo" href="index.html"><img src="assets/logo-dark.png" alt="Five Point Five Brewing Co" /></a>
+    <nav class="nav-links"><a href="index.html#tap">Beer</a><a href="index.html#pizza">Pizza</a><a href="index.html#merch">Merch</a><a href="index.html#events">Events</a><a href="reservations.html">Reserve</a></nav>
+  </div>
+</header>
+<div class="wrap above" id="content"></div>
+<footer><div class="copy"><span>© <span id="yr"></span> Five Point Five Brewing Co · 137 Nevada St, El Segundo</span><span><a href="index.html#merch">← All merch</a></span></div></footer>
+<script>
+document.getElementById('yr').textContent=new Date().getFullYear();
+const SB_URL="https://mugbbbfqzxsnaxcmfsnb.supabase.co";
+const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z2JiYmZxenhzbmF4Y21mc25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzI4OTMsImV4cCI6MjA5NTg0ODg5M30.OqHOvDcoQH9PSn5-c4w7jxO9Z4JfExkEZOCn8m75xUs";
+const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"application/json"};
+const DEFAULT_MERCH=[
+  {name:"Five Point Five Tee", price:"$28", desc:"Soft tri-blend tee with our wordmark. Unisex sizing.", images:[], video:"", link:"", linkLabel:""},
+  {name:"Trucker Hat", price:"$26", desc:"Classic foam-front trucker with the 5.5 patch.", images:[], video:"", link:"", linkLabel:""},
+  {name:"Logo Pint Glass", price:"$12", desc:"16oz pint glass etched with the Five Point Five logo.", images:[], video:"", link:"", linkLabel:""},
+  {name:"Patio Hoodie", price:"$52", desc:"Heavyweight hoodie for cold patio nights.", images:[], video:"", link:"", linkLabel:""}
+];
+const slugify=(s)=>(s||'').toLowerCase().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
+const esc=(s)=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+function getId(){ return new URLSearchParams(location.search).get('id')||''; }
+async function getMerch(){
+  try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.merch&&d.merch.length) return d.merch; } }catch(e){}
+  return DEFAULT_MERCH;
+}
+let IMGS=[], cur=0;
+function show(i){ cur=(i+IMGS.length)%IMGS.length;
+  document.getElementById('slide').style.backgroundImage="url('"+IMGS[cur]+"')";
+  document.querySelectorAll('.dots span').forEach((s,k)=>s.classList.toggle('on',k===cur));
+  document.querySelectorAll('.thumbs img').forEach((t,k)=>t.classList.toggle('on',k===cur));
+}
+function step(n){ show(cur+n); }
+function videoHTML(v){ v=(v||'').trim(); if(!v) return '';
+  const yt=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+  if(yt) return `<div class="vid"><iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe></div>`;
+  if(/\.(mp4|webm|mov)(\?|$)/i.test(v)) return `<div class="vid"><video src="${esc(v)}" controls playsinline></video></div>`;
+  return ''; }
+async function render(){
+  const id=getId(); const merch=await getMerch();
+  const m=merch.find(x=>slugify(x.name)===id);
+  const el=document.getElementById('content');
+  if(!m){ el.innerHTML='<div class="notfound"><h1 class="display">Item not found</h1><p style="color:var(--muted);margin-bottom:24px">This item may have sold out or moved.</p><a class="btn btn-primary" href="index.html#merch">See all merch</a></div>'; return; }
+  document.title=`${m.name} — Five Point Five Brewing Co`;
+  IMGS=(m.images&&m.images.length)?m.images:(m.img?[m.img]:[]);
+  const price = m.price ? (/^\s*\$/.test(m.price)?m.price:'$'+m.price) : '';
+  const hasImgs=IMGS.length>0;
+  const carousel = hasImgs ? `
+    <div class="car">
+      <div class="slide" id="slide" style="background-image:url('${IMGS[0]}')"></div>
+      ${IMGS.length>1?`<button class="arrow prev" onclick="step(-1)">‹</button><button class="arrow next" onclick="step(1)">›</button>
+      <div class="dots">${IMGS.map((_,k)=>`<span class="${k===0?'on':''}" onclick="show(${k})"></span>`).join('')}</div>`:''}
+    </div>
+    ${IMGS.length>1?`<div class="thumbs">${IMGS.map((u,k)=>`<img src="${u}" class="${k===0?'on':''}" onclick="show(${k})">`).join('')}</div>`:''}`
+    : `<div class="car"><div class="slide"><div class="ph"><b>🧢</b><span>Photos coming soon</span></div></div></div>`;
+  const buy = m.link ? `<a class="btn btn-primary" href="${esc(m.link)}" ${/^https?:/.test(m.link)?'target="_blank" rel="noopener"':''}>${esc(m.linkLabel||'Shop')} →</a>` : '';
+  el.innerHTML=`
+    <a class="back" href="index.html#merch">‹ All merch</a>
+    <div class="grid">
+      <div>${carousel}</div>
+      <div class="info">
+        <span class="eyebrow">Five Point Five Merch</span>
+        <h1 class="display">${esc(m.name)}</h1>
+        ${price?`<div class="price">${esc(price)}</div>`:''}
+        <div class="desc">${esc(m.desc||'')}</div>
+        ${videoHTML(m.video)}
+        <div class="cta-row">${buy}<a class="btn btn-ghost" href="index.html#visit">Find us in the taproom</a></div>
+      </div>
+    </div>`;
+  document.addEventListener('keydown',e=>{ if(e.key==='ArrowRight')step(1); if(e.key==='ArrowLeft')step(-1); });
+}
+render();
+(function(){try{ var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);} var ua=navigator.userAgent||''; var d=/iPad|Tablet/i.test(ua)?'Tablet':(/Mobi|Android|iPhone/i.test(ua)?'Mobile':'Desktop'); var ref=''; try{ if(document.referrer){ var h=new URL(document.referrer).hostname; if(h&&h!==location.hostname) ref=h; } }catch(e){} fetch(SB_URL+'/rest/v1/rpc/track_view',{method:'POST',headers:SB_H,keepalive:true,body:JSON.stringify({p_path:location.pathname,p_visitor:v,p_device:d,p_referrer:ref})}).catch(function(){}); }catch(e){}})();
+</script>
+</body>
+</html>
