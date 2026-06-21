@@ -103,9 +103,11 @@
 
 <div class="wrap">
   <div class="tabs">
+    <button class="tab" data-tab="homepage" onclick="switchTab('homepage')">🏠 Homepage</button>
     <button class="tab active" data-tab="beers" onclick="switchTab('beers')">🍺 Beer</button>
     <button class="tab" data-tab="seltzers" onclick="switchTab('seltzers')">🥂 Seltzers</button>
     <button class="tab" data-tab="pizzas" onclick="switchTab('pizzas')">🍕 Pizza</button>
+    <button class="tab" data-tab="merch" onclick="switchTab('merch')">🧢 Merch</button>
     <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
     <button class="tab" data-tab="quotes" onclick="switchTab('quotes')">💬 Quotes</button>
     <button class="tab" data-tab="events" onclick="switchTab('events')">📅 Events</button>
@@ -137,6 +139,25 @@
       </div>
     </div>
     <div id="list"></div>
+    <div id="homepagePanel" style="display:none">
+      <div class="card" style="margin-bottom:14px">
+        <label>Big title</label>
+        <textarea id="hpTitle" rows="3" oninput="hpUpdate()" placeholder="Your favorite&#10;brewery's *favorite brewery.*"></textarea>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Press Enter for a line break. Wrap words in <b>*stars*</b> to color them, e.g. <b>*favorite brewery.*</b></div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <label>Subtitle</label>
+        <textarea id="hpLead" rows="2" oninput="hpUpdate()"></textarea>
+      </div>
+      <div class="card" style="margin-bottom:14px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:16px">
+        <div><label>Title size · <span id="hpSizeV"></span></label><input type="range" id="hpSize" min="0.7" max="1.4" step="0.05" oninput="hpUpdate()" style="width:100%"></div>
+        <div><label>Letter spacing · <span id="hpLsV"></span></label><input type="range" id="hpLs" min="-3" max="6" step="0.5" oninput="hpUpdate()" style="width:100%"></div>
+        <div><label>Line height · <span id="hpLhV"></span></label><input type="range" id="hpLh" min="0.82" max="1.15" step="0.01" oninput="hpUpdate()" style="width:100%"></div>
+      </div>
+      <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Live preview</div>
+      <div id="hpPreview" style="background:#f1e8d6;border:1px solid var(--line);border-radius:14px;padding:28px 24px;overflow:hidden"></div>
+      <div style="margin-top:14px;color:var(--muted);font-size:13px">When it looks right, hit <b>💾 Publish changes</b> to push it live.</div>
+    </div>
     <div id="analyticsPanel" style="display:none">
       <div style="display:flex;gap:8px;margin-bottom:18px;flex-wrap:wrap">
         <button class="btn btn-ghost btn-sm" onclick="loadStats(7)">7 days</button>
@@ -177,6 +198,12 @@ const DEFAULT_DATA = {
     {name:"Opal GT", desc:"Jack & provolone, mozzarella, fontina, bechamel sauce.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/25f81f9e-9426-4e7b-aaf1-a419c440452a/Opal.png"},
     {name:"VW Bus", desc:"Vegan harissa tomato sauce, olive mix and kale, roasted garlic eggplant.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/fe9944e0-3f7a-448b-bb97-6a4763a588d7/VW+Bus.png"}
   ],
+  merch:[
+    {name:"Five Point Five Tee", price:"$28", desc:"Soft tri-blend tee with our wordmark. Unisex sizing.", img:"", video:"", link:"", linkLabel:""},
+    {name:"Trucker Hat", price:"$26", desc:"Classic foam-front trucker with the 5.5 patch.", img:"", video:"", link:"", linkLabel:""},
+    {name:"Logo Pint Glass", price:"$12", desc:"16oz pint glass etched with the Five Point Five logo.", img:"", video:"", link:"", linkLabel:""},
+    {name:"Patio Hoodie", price:"$52", desc:"Heavyweight hoodie for cold patio nights.", img:"", video:"", link:"", linkLabel:""}
+  ],
   gallery:[
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"Golden hour"},
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Oktoberfest"},
@@ -214,6 +241,7 @@ const SCHEMA = {
   beers:[["name","Name","input"],["type","Style (e.g. Hazy IPA)","input"],["abv","ABV (e.g. 6.8%)","input"],["tag","Badge — start with 🥇 🥈 🥉 for a medal (e.g. “🥉 2026 Cap Expo”), or plain text like “New”","input"],["logo","Logo image URL","input"],["desc","Description","textarea"]],
   seltzers:[["name","Name","input"],["type","Type","input"],["abv","ABV","input"],["tag","Badge","input"],["desc","Description","textarea"]],
   pizzas:[["name","Pizza name","input"],["img","Image URL","input"],["desc","Description","textarea"]],
+  merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["img","Photo","input"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
   events:[["date","Date","date"],["end","Ends at (optional — auto-hides after this time)","time"],["title","Event title","input"],["when","When (shown text, e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
@@ -223,12 +251,14 @@ const TITLES = {
   beers:["Beer","Your tap list. Shows in the \"Our Beers\" section. Edit any cell or add a new beer."],
   seltzers:["Hard Seltzers","Shows under the seltzers row. Add or edit cells freely."],
   pizzas:["Pi's by Pi LA","Your car-themed pies. Shows in the Pizza section."],
+  merch:["Merch","Shop items shown in the Merch section. Add a photo (or video), price and description."],
   gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
   quotes:["Quotes","Rotating reviews & quotes shown over the video. Changes hourly. Replace samples with your real Yelp/Google reviews."],
   events:["Upcoming Events","Each event gets its own page. Once the date (and end time) passes, it moves to Past Events automatically."],
   pastevents:["Past Events","Events that have ended. Hit ↻ Renew to set a new date and bring one back as upcoming."],
   hours:["Hours","Your weekly hours. Shows in Hours & Location."],
-  analytics:["Analytics","Traffic at a glance — views, unique visitors, devices and where people come from."]
+  analytics:["Analytics","Traffic at a glance — views, unique visitors, devices and where people come from."],
+  homepage:["Homepage Hero","Edit the big front-page title and subtitle, and fine-tune the size and spacing."]
 };
 const SOURCE={ pastevents:'events' };
 const FILTER={ events:(e)=>!evPast(e), pastevents:(e)=>evPast(e) };
@@ -238,6 +268,7 @@ const BLANK = {
   beers:{name:"New beer",type:"",abv:"",tag:"",logo:"",desc:""},
   seltzers:{name:"New seltzer",type:"Hard Seltzer",abv:"5%",tag:"Seltzer",desc:""},
   pizzas:{name:"New pizza",img:"",desc:""},
+  merch:{name:"New item",price:"",desc:"",img:"",video:"",link:"",linkLabel:""},
   gallery:{cap:"New photo",img:""},
   quotes:{text:"New quote",by:"",src:""},
   events:{id:"",date:"",end:"",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
@@ -276,16 +307,45 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
   document.getElementById('panel-title').textContent=TITLES[t][0];
   document.getElementById('panel-desc').textContent=TITLES[t][1];
-  const isA = (t==='analytics');
+  const isA = (t==='analytics'), isH = (t==='homepage');
   document.getElementById('analyticsPanel').style.display = isA ? 'block' : 'none';
-  document.getElementById('list').style.display = isA ? 'none' : 'block';
-  document.getElementById('headBtns').style.display = (isA||t==='pastevents') ? 'none' : 'flex';
+  document.getElementById('homepagePanel').style.display = isH ? 'block' : 'none';
+  document.getElementById('list').style.display = (isA||isH) ? 'none' : 'block';
+  document.getElementById('headBtns').style.display = (isA||isH||t==='pastevents') ? 'none' : 'flex';
   document.getElementById('upBtn').style.display = (t==='gallery') ? 'inline-flex' : 'none';
   const ab=document.getElementById('albumBox');
   if(ab){ ab.style.display = (t==='gallery') ? 'block' : 'none';
     if(t==='gallery'){ data.settings=data.settings||{albumUrl:''}; document.getElementById('albumUrl').value=data.settings.albumUrl||''; } }
   if(isA){ loadStats(statsDays); return; }
+  if(isH){ loadHomeControls(); return; }
   renderList();
+}
+
+/* ---- Homepage hero controls ---- */
+const DEFAULT_HERO_TITLE="Your favorite\nbrewery's *favorite\nbrewery.*";
+const DEFAULT_HERO_LEAD="Hand crafted beer inspired by our little 5.5 square mile corner of paradise.";
+function loadHomeControls(){
+  const s=data.settings||(data.settings={});
+  document.getElementById('hpTitle').value = (s.heroTitle!=null?s.heroTitle:DEFAULT_HERO_TITLE);
+  document.getElementById('hpLead').value  = (s.heroLead!=null?s.heroLead:DEFAULT_HERO_LEAD);
+  document.getElementById('hpSize').value  = s.heroScale||1;
+  document.getElementById('hpLs').value    = (s.heroLetter!=null?s.heroLetter:0.5);
+  document.getElementById('hpLh').value     = s.heroLine||0.96;
+  hpUpdate();
+}
+function hpUpdate(){
+  const s=data.settings||(data.settings={});
+  const t=document.getElementById('hpTitle').value, l=document.getElementById('hpLead').value;
+  const sz=+document.getElementById('hpSize').value, ls=+document.getElementById('hpLs').value, lh=+document.getElementById('hpLh').value;
+  s.heroTitle=t; s.heroLead=l; s.heroScale=sz; s.heroLetter=ls; s.heroLine=lh;
+  document.getElementById('hpSizeV').textContent=Math.round(sz*100)+'%';
+  document.getElementById('hpLsV').textContent=ls+'px';
+  document.getElementById('hpLhV').textContent=lh.toFixed(2);
+  const html=(t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*([^*]+)\*/g,'<span style="color:#c2744f">$1</span>').replace(/\n/g,'<br>');
+  document.getElementById('hpPreview').innerHTML=
+    '<div style="font-family:Anton,sans-serif;text-transform:uppercase;color:#3a2f24;font-size:calc(38px * '+sz+');letter-spacing:'+ls+'px;line-height:'+lh+'">'+html+'</div>'+
+    '<p style="font-family:Inter,sans-serif;color:#5b4d3c;margin:14px 0 0;font-size:16px">'+((l||'').replace(/&/g,'&amp;').replace(/</g,'&lt;'))+'</p>';
+  persist();
 }
 
 /* ---- Analytics ---- */

@@ -130,6 +130,22 @@
   .pizza h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:24px;margin-bottom:8px;line-height:1}
   .pizza p{color:var(--ink-soft);font-size:14px}
 
+  /* ---------- Merch ---------- */
+  .merch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
+  .merch{background:var(--card);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden;transition:transform .18s,box-shadow .18s;box-shadow:0 2px 0 var(--line)}
+  .merch:hover{transform:translateY(-4px);box-shadow:0 14px 26px rgba(58,47,36,.14)}
+  .merch .media{aspect-ratio:1/1;background:var(--paper-deep);display:flex;align-items:center;justify-content:center;overflow:hidden}
+  .merch .media img,.merch .media video,.merch .media iframe{width:100%;height:100%;object-fit:cover;display:block;border:0}
+  .merch .ph{color:var(--muted);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:8px}
+  .merch .ph span{font-size:13px}
+  .merch .ph b{font-size:32px}
+  .merch .body{padding:18px 20px 22px}
+  .merch .top{display:flex;justify-content:space-between;align-items:baseline;gap:10px}
+  .merch h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:21px;line-height:1.05}
+  .merch .price{font-weight:800;color:var(--terra);white-space:nowrap;font-size:16px}
+  .merch p{color:var(--ink-soft);font-size:14px;margin-top:6px}
+  .merch .shop{display:inline-block;margin-top:12px;font-weight:700;color:var(--terra);font-size:14px}
+
   /* photo PILE */
   #gallery{background:radial-gradient(120% 90% at 50% 0%, rgba(0,0,0,.05), transparent 60%), var(--table)}
   .pile{position:relative;width:100%;margin-top:8px}
@@ -235,7 +251,7 @@
   <div class="wrap nav-inner">
     <a class="nav-logo" href="#top"><img src="assets/logo-dark.png" alt="Five Point Five Brewing Co" /></a>
     <nav class="nav-links">
-      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#visit">Visit</a>
+      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#merch">Merch</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#visit">Visit</a>
     </nav>
     <a class="btn btn-primary" href="reservations.html">Make a Reservation</a>
     <button class="menu-toggle" onclick="document.querySelector('.nav-links').style.display='flex'">≡</button>
@@ -433,6 +449,14 @@
   </div>
 </section>
 
+<!-- MERCH -->
+<section class="block above" id="merch">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Take some home</span><h2 class="display">Merch</h2></div></div>
+    <div class="merch-grid" id="merch-grid"></div>
+  </div>
+</section>
+
 <!-- VISIT -->
 <section class="block above" id="visit">
   <div class="wrap">
@@ -460,7 +484,6 @@
     <p>Book a table for the game, a trivia team, or a private party in the back patio.</p>
     <div class="row">
       <a class="btn btn-primary" href="reservations.html">Make a Reservation →</a>
-      <a class="btn btn-ghost" href="https://www.toasttab.com/five-point-five-brewing-co-137-nevada-street/giftcards">Buy a Gift Card</a>
     </div>
   </div>
 </section>
@@ -482,8 +505,6 @@
       <div class="foot-col"><h4>Explore</h4><a href="#tap">Beer & Seltzer</a><a href="#pizza">Pi's by Pi LA</a><a href="#gallery">Photos</a><a href="#events">Events</a></div>
       <div class="foot-col"><h4>Do More</h4>
         <a href="reservations.html">Reservations</a>
-        <a href="https://www.toasttab.com/five-point-five-brewing-co-137-nevada-street/giftcards">Buy Gift Cards</a>
-        <a href="https://www.toasttab.com/five-point-five-brewing-co-137-nevada-street/findcard">Check Card Balance</a>
         <a href="https://www.yelp.com/biz/five-point-five-brewing-el-segundo-2">Reviews</a>
       </div>
       <div class="foot-col"><h4>Visit</h4>
@@ -542,6 +563,12 @@ const DEFAULT_DATA = {
     {name:"Jeepney", desc:"Smoked Filipino sausage, onions & sweet peppers, ube yams, banana tomato sauce. Cheese crust.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/d6e69a6f-b3eb-4cd6-8696-9cf6a942ba99/Jeepney.png"},
     {name:"Opal GT", desc:"Jack & provolone, mozzarella, fontina, bechamel sauce.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/25f81f9e-9426-4e7b-aaf1-a419c440452a/Opal.png"},
     {name:"VW Bus", desc:"Vegan harissa tomato sauce, olive mix and kale, roasted garlic eggplant.", img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/fe9944e0-3f7a-448b-bb97-6a4763a588d7/VW+Bus.png"}
+  ],
+  merch:[
+    {name:"Five Point Five Tee", price:"$28", desc:"Soft tri-blend tee with our wordmark. Unisex sizing.", img:"", video:"", link:"", linkLabel:""},
+    {name:"Trucker Hat", price:"$26", desc:"Classic foam-front trucker with the 5.5 patch.", img:"", video:"", link:"", linkLabel:""},
+    {name:"Logo Pint Glass", price:"$12", desc:"16oz pint glass etched with the Five Point Five logo.", img:"", video:"", link:"", linkLabel:""},
+    {name:"Patio Hoodie", price:"$52", desc:"Heavyweight hoodie for cold patio nights.", img:"", video:"", link:"", linkLabel:""}
   ],
   gallery:[
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"Golden hour"},
@@ -638,6 +665,20 @@ function evDateObj(e){
 function evEnd(e){ const d=evDateObj(e); if(!d) return null; const t=(e.end||'23:59').split(':'); d.setHours(+t[0]||23,+t[1]||59,59,0); return d; }
 function evPast(e){ const end=evEnd(e); return end? Date.now()>end.getTime() : false; }
 function evChip(e){ const d=evDateObj(e); if(d) return {mo:EV_MO[d.getMonth()], day:d.getDate()}; return {mo:e.month||'', day:e.day||''}; }
+/* ---- editable hero title/subtitle + size & spacing controls ---- */
+const DEFAULT_HERO_TITLE="Your favorite\nbrewery's *favorite\nbrewery.*";
+const DEFAULT_HERO_LEAD="Hand crafted beer inspired by our little 5.5 square mile corner of paradise.";
+function heroHTML(t){ return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*([^*]+)\*/g,'<span class="l2">$1</span>').replace(/\n/g,'<br>'); }
+function applyHero(d){
+  const s=(d&&d.settings)||{};
+  const h1=document.querySelector('.hero h1');
+  if(h1){ h1.innerHTML=heroHTML(s.heroTitle!=null?s.heroTitle:DEFAULT_HERO_TITLE);
+    h1.style.fontSize='calc(clamp(46px,10.5vw,132px) * '+(s.heroScale||1)+')';
+    h1.style.letterSpacing=((s.heroLetter!=null)?s.heroLetter:0.5)+'px';
+    h1.style.lineHeight=(s.heroLine||0.96); }
+  const lead=document.querySelector('.hero .lead');
+  if(lead){ lead.textContent=(s.heroLead!=null?s.heroLead:DEFAULT_HERO_LEAD); }
+}
 function rand(seed){ const x=Math.sin(seed*99.13)*10000; return x-Math.floor(x); }
 
 function layoutPile(){
@@ -684,12 +725,28 @@ function morePhotos(){ if(!GAL.length) return; pilePage=(pilePage+1)%pilePages()
 
 function render(){
   const d=getData();
+  applyHero(d);
   MANUAL=d.gallery||[]; GAL=MANUAL.slice(); QUOTES=d.quotes||[];
   document.getElementById('tap-grid').innerHTML = (d.beers||[]).map(beerCard).join('');
   document.getElementById('seltzer-grid').innerHTML = (d.seltzers||[]).map(beerCard).join('');
   document.getElementById('pizza-grid').innerHTML = (d.pizzas||[]).map(p=>`
     <div class="pizza"><div class="img">${p.img?`<img src="${p.img}" alt="${p.name}">`:''}</div>
       <div class="body"><h3>${p.name}</h3><p>${p.desc||''}</p></div></div>`).join('');
+  document.getElementById('merch-grid').innerHTML = (d.merch||[]).map(m=>{
+    const price = m.price ? (/^\s*\$/.test(m.price)?m.price:'$'+m.price) : '';
+    const v=(m.video||'').trim();
+    let media;
+    if(v){ const yt=v.match(/(?:youtu\.be\/|youtube\.com\/(?:watch\?v=|embed\/))([\w-]{11})/);
+      media = yt ? `<iframe src="https://www.youtube.com/embed/${yt[1]}" allowfullscreen></iframe>`
+        : /\.(mp4|webm|mov)(\?|$)/i.test(v) ? `<video src="${v}" autoplay muted loop playsinline></video>`
+        : `<img src="${m.img||''}" alt="${m.name||''}">`;
+    } else if(m.img){ media=`<img src="${m.img}" alt="${m.name||''}">`; }
+    else { media=`<div class="ph"><b>🧢</b><span>Photo coming soon</span></div>`; }
+    const shop = m.link ? `<a class="shop" href="${m.link}" ${/^https?:/.test(m.link)?'target="_blank" rel="noopener"':''}>${m.linkLabel||'Shop'} →</a>` : '';
+    return `<div class="merch"><div class="media">${media}</div>
+      <div class="body"><div class="top"><h3>${m.name||''}</h3>${price?`<span class="price">${price}</span>`:''}</div>
+      <p>${m.desc||''}</p>${shop}</div></div>`;
+  }).join('') || '<div style="color:var(--muted)">Merch coming soon.</div>';
   pilePage=0;
   layoutPile();
   loadAlbumPhotos();   // pull iCloud shared album if configured; merges with manual uploads
