@@ -203,7 +203,7 @@
 </div>
 
 <script>
-const RESERVATION_EMAIL = "michelle@fivepointfivebrewing.com";
+const RESERVATION_EMAIL = "events@fivepointfivebrewing.com";
 const SB_URL="https://mugbbbfqzxsnaxcmfsnb.supabase.co";
 const SB_ANON="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im11Z2JiYmZxenhzbmF4Y21mc25iIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODAyNzI4OTMsImV4cCI6MjA5NTg0ODg5M30.OqHOvDcoQH9PSn5-c4w7jxO9Z4JfExkEZOCn8m75xUs";
 const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"application/json"};
@@ -267,7 +267,7 @@ form.addEventListener('submit', async (e)=>{
   btn.disabled=true; btn.textContent='Sending…';
 
   try{
-    const res=await fetch('/api/reserve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
+    const res=await fetch(SB_URL+'/functions/v1/reserve',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify(data)});
     if(res.ok){ showDone(); return; }
     throw new Error('endpoint');
   }catch(err){

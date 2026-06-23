@@ -155,6 +155,15 @@
         <div><label>Letter spacing · <span id="hpLsV"></span></label><input type="range" id="hpLs" min="-3" max="6" step="0.5" oninput="hpUpdate()" style="width:100%"></div>
         <div><label>Line height · <span id="hpLhV"></span></label><input type="range" id="hpLh" min="0.82" max="1.15" step="0.01" oninput="hpUpdate()" style="width:100%"></div>
       </div>
+      <div class="card" style="margin-bottom:14px">
+        <label style="display:block;margin-bottom:10px">Social links</label>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+          <div><label>Instagram</label><input id="hpIg" oninput="hpUpdate()" placeholder="https://instagram.com/…"></div>
+          <div><label>Facebook</label><input id="hpFb" oninput="hpUpdate()" placeholder="https://facebook.com/…"></div>
+          <div><label>X (Twitter)</label><input id="hpX" oninput="hpUpdate()" placeholder="https://x.com/…"></div>
+          <div><label>Yelp</label><input id="hpYelp" oninput="hpUpdate()" placeholder="https://yelp.com/biz/…"></div>
+        </div>
+      </div>
       <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Live preview</div>
       <div id="hpPreview" style="background:#f1e8d6;border:1px solid var(--line);border-radius:14px;padding:28px 24px;overflow:hidden"></div>
       <div style="margin-top:14px;color:var(--muted);font-size:13px">When it looks right, hit <b>💾 Publish changes</b> to push it live.</div>
@@ -295,11 +304,13 @@ const SB_H={apikey:SB_ANON,Authorization:"Bearer "+SB_ANON,"Content-Type":"appli
 function mergeDefaults(d){ for(const k in DEFAULT_DATA){ if(d[k]===undefined||d[k]===null) d[k]=JSON.parse(JSON.stringify(DEFAULT_DATA[k])); } return d; }
 function loadLocal(){ try{const s=localStorage.getItem('fpf_site_data'); if(s) return mergeDefaults(JSON.parse(s));}catch(e){} return JSON.parse(JSON.stringify(DEFAULT_DATA)); }
 // Pull the live published content from the database so you're editing what's actually online.
+let liveLoaded=false;
 async function loadLive(){
   try{
     const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'});
-    if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ data=mergeDefaults(d); persist(); switchTab(current); } }
-  }catch(e){}
+    if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ data=mergeDefaults(d); persist(); switchTab(current); } liveLoaded=true; showToast('Loaded your live content ✓'); return; }
+    throw 0;
+  }catch(e){ liveLoaded=false; showToast('⚠ Couldn’t load your live content — refresh before editing'); }
 }
 function persist(){ try{ localStorage.setItem('fpf_site_data', JSON.stringify(data)); }catch(e){} }   // local draft
 
@@ -325,6 +336,7 @@ function switchTab(t){
 /* ---- Homepage hero controls ---- */
 const DEFAULT_HERO_TITLE="Your favorite\nbrewery's *favorite\nbrewery.*";
 const DEFAULT_HERO_LEAD="Hand crafted beer inspired by our little 5.5 square mile corner of paradise.";
+const DEFAULT_SOCIAL={ig:"https://www.instagram.com/fivepointfivebrewing",fb:"http://facebook.com/fivepointfivebrewing",x:"https://twitter.com/5point5brewing",yelp:"https://www.yelp.com/biz/five-point-five-brewing-el-segundo-2"};
 function loadHomeControls(){
   const s=data.settings||(data.settings={});
   document.getElementById('hpTitle').value = (s.heroTitle!=null?s.heroTitle:DEFAULT_HERO_TITLE);
@@ -332,6 +344,10 @@ function loadHomeControls(){
   document.getElementById('hpSize').value  = s.heroScale||1;
   document.getElementById('hpLs').value    = (s.heroLetter!=null?s.heroLetter:0.5);
   document.getElementById('hpLh').value     = s.heroLine||0.96;
+  document.getElementById('hpIg').value   = (s.ig!=null?s.ig:DEFAULT_SOCIAL.ig);
+  document.getElementById('hpFb').value   = (s.fb!=null?s.fb:DEFAULT_SOCIAL.fb);
+  document.getElementById('hpX').value    = (s.x!=null?s.x:DEFAULT_SOCIAL.x);
+  document.getElementById('hpYelp').value = (s.yelp!=null?s.yelp:DEFAULT_SOCIAL.yelp);
   hpUpdate();
 }
 function hpUpdate(){
@@ -339,6 +355,7 @@ function hpUpdate(){
   const t=document.getElementById('hpTitle').value, l=document.getElementById('hpLead').value;
   const sz=+document.getElementById('hpSize').value, ls=+document.getElementById('hpLs').value, lh=+document.getElementById('hpLh').value;
   s.heroTitle=t; s.heroLead=l; s.heroScale=sz; s.heroLetter=ls; s.heroLine=lh;
+  s.ig=document.getElementById('hpIg').value.trim(); s.fb=document.getElementById('hpFb').value.trim(); s.x=document.getElementById('hpX').value.trim(); s.yelp=document.getElementById('hpYelp').value.trim();
   document.getElementById('hpSizeV').textContent=Math.round(sz*100)+'%';
   document.getElementById('hpLsV').textContent=ls+'px';
   document.getElementById('hpLhV').textContent=lh.toFixed(2);
@@ -562,6 +579,7 @@ function renewEvent(i){ const ev=data.events[i]; if(!ev) return; ev.date=''; ev.
 async function saveAll(){
   persist();
   if(!ADMIN_PW){ showToast('Enter your passcode first'); return; }
+  if(!liveLoaded){ showToast('⚠ Your live content hasn’t loaded yet — refresh the page first (protects you from overwriting)'); return; }
   const btn=document.getElementById('saveBtn'); if(btn){ btn.disabled=true; btn.textContent='Publishing…'; }
   try{
     const r=await fetch(SB_URL+'/rest/v1/rpc/publish_content',{method:'POST',headers:SB_H,body:JSON.stringify({p_password:ADMIN_PW,p_data:data})});
@@ -582,10 +600,11 @@ function exportJSON(){
 }
 
 function tryPass(){
-  const v=document.getElementById('pass').value.trim();
-  if(!v){ showToast('Enter your passcode'); return; }
-  ADMIN_PW=v;                                   // validated by the server when you Publish
+  const v=document.getElementById('pass').value.trim().toLowerCase();
+  if(v!=='bungalow'){ showToast('Wrong passcode'); return; }
+  ADMIN_PW='bungalow';                           // also validated by the database on Publish
   document.getElementById('gate').style.display='none';
+  if(!liveLoaded) loadLive();                    // load the latest live content before editing
 }
 
 // floating Publish button
