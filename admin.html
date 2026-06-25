@@ -108,6 +108,7 @@
     <button class="tab" data-tab="seltzers" onclick="switchTab('seltzers')">🥂 Seltzers</button>
     <button class="tab" data-tab="pizzas" onclick="switchTab('pizzas')">🍕 Pizza</button>
     <button class="tab" data-tab="merch" onclick="switchTab('merch')">🧢 Merch</button>
+    <button class="tab" data-tab="taproom" onclick="switchTab('taproom')">🏛 Taproom</button>
     <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
     <button class="tab" data-tab="quotes" onclick="switchTab('quotes')">💬 Quotes</button>
     <button class="tab" data-tab="events" onclick="switchTab('events')">📅 Events</button>
@@ -163,6 +164,11 @@
           <div><label>X (Twitter)</label><input id="hpX" oninput="hpUpdate()" placeholder="https://x.com/…"></div>
           <div><label>Yelp</label><input id="hpYelp" oninput="hpUpdate()" placeholder="https://yelp.com/biz/…"></div>
         </div>
+      </div>
+      <div class="card" style="margin-bottom:14px">
+        <label>Background video behind the title (optional)</label>
+        <input id="hpVideo" oninput="hpUpdate()" placeholder="https://… .mp4  (or a YouTube link)">
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Paste a hosted <b>.mp4</b> link (best quality) or a YouTube link — it plays muted on a loop behind the El Segundo tower title. Leave blank for the plain paper hero.</div>
       </div>
       <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Live preview</div>
       <div id="hpPreview" style="background:#f1e8d6;border:1px solid var(--line);border-radius:14px;padding:28px 24px;overflow:hidden"></div>
@@ -243,7 +249,12 @@ const DEFAULT_DATA = {
     {d:"Friday – Saturday", h:"12:00 PM – 10:00 PM"},
     {d:"Sunday", h:"12:00 PM – 8:00 PM"}
   ],
-  settings:{ albumUrl:"" }
+  taproom:[
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"The taproom"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Inside"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", cap:"The patio"}
+  ],
+  settings:{ albumUrl:"", heroVideo:"" }
 };
 
 // field schema per section: [key, label, type]
@@ -253,6 +264,7 @@ const SCHEMA = {
   pizzas:[["name","Pizza name","input"],["img","Image URL","input"],["desc","Description","textarea"]],
   merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["images","Photos (carousel — first one is the thumbnail)","images"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
+  taproom:[["cap","Caption (optional)","input"],["img","Photo","image"]],
   quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
   events:[["date","Date","date"],["end","Ends at (optional — auto-hides after this time)","time"],["title","Event title","input"],["when","When (shown text, e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
   hours:[["d","Days","input"],["h","Hours","input"]]
@@ -263,6 +275,7 @@ const TITLES = {
   pizzas:["Pi's by Pi LA","Your car-themed pies. Shows in the Pizza section."],
   merch:["Merch","Shop items shown in the Merch section. Add a photo (or video), price and description."],
   gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
+  taproom:["The Taproom","Professional photos of your space. Shows in the clean grid gallery. Upload or paste a photo, add an optional caption."],
   quotes:["Quotes","Rotating reviews & quotes shown over the video. Changes hourly. Replace samples with your real Yelp/Google reviews."],
   events:["Upcoming Events","Each event gets its own page. Once the date (and end time) passes, it moves to Past Events automatically."],
   pastevents:["Past Events","Events that have ended. Hit ↻ Renew to set a new date and bring one back as upcoming."],
@@ -280,6 +293,7 @@ const BLANK = {
   pizzas:{name:"New pizza",img:"",desc:""},
   merch:{name:"New item",price:"",desc:"",images:[],video:"",link:"",linkLabel:""},
   gallery:{cap:"New photo",img:""},
+  taproom:{cap:"",img:""},
   quotes:{text:"New quote",by:"",src:""},
   events:{id:"",date:"",end:"",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
   hours:{d:"Day",h:"Hours"}
@@ -324,7 +338,7 @@ function switchTab(t){
   document.getElementById('homepagePanel').style.display = isH ? 'block' : 'none';
   document.getElementById('list').style.display = (isA||isH) ? 'none' : 'block';
   document.getElementById('headBtns').style.display = (isA||isH||t==='pastevents') ? 'none' : 'flex';
-  document.getElementById('upBtn').style.display = (t==='gallery') ? 'inline-flex' : 'none';
+  document.getElementById('upBtn').style.display = (t==='gallery'||t==='taproom') ? 'inline-flex' : 'none';
   const ab=document.getElementById('albumBox');
   if(ab){ ab.style.display = (t==='gallery') ? 'block' : 'none';
     if(t==='gallery'){ data.settings=data.settings||{albumUrl:''}; document.getElementById('albumUrl').value=data.settings.albumUrl||''; } }
@@ -337,6 +351,7 @@ function switchTab(t){
 const DEFAULT_HERO_TITLE="Your favorite\nbrewery's *favorite\nbrewery.*";
 const DEFAULT_HERO_LEAD="Hand crafted beer inspired by our little 5.5 square mile corner of paradise.";
 const DEFAULT_SOCIAL={ig:"https://www.instagram.com/fivepointfivebrewing",fb:"http://facebook.com/fivepointfivebrewing",x:"https://twitter.com/5point5brewing",yelp:"https://www.yelp.com/biz/five-point-five-brewing-el-segundo-2"};
+const DEFAULT_HERO_VIDEO="assets/tower.mp4";
 function loadHomeControls(){
   const s=data.settings||(data.settings={});
   document.getElementById('hpTitle').value = (s.heroTitle!=null?s.heroTitle:DEFAULT_HERO_TITLE);
@@ -348,6 +363,7 @@ function loadHomeControls(){
   document.getElementById('hpFb').value   = (s.fb!=null?s.fb:DEFAULT_SOCIAL.fb);
   document.getElementById('hpX').value    = (s.x!=null?s.x:DEFAULT_SOCIAL.x);
   document.getElementById('hpYelp').value = (s.yelp!=null?s.yelp:DEFAULT_SOCIAL.yelp);
+  document.getElementById('hpVideo').value = (s.heroVideo!=null?s.heroVideo:DEFAULT_HERO_VIDEO);
   hpUpdate();
 }
 function hpUpdate(){
@@ -356,6 +372,7 @@ function hpUpdate(){
   const sz=+document.getElementById('hpSize').value, ls=+document.getElementById('hpLs').value, lh=+document.getElementById('hpLh').value;
   s.heroTitle=t; s.heroLead=l; s.heroScale=sz; s.heroLetter=ls; s.heroLine=lh;
   s.ig=document.getElementById('hpIg').value.trim(); s.fb=document.getElementById('hpFb').value.trim(); s.x=document.getElementById('hpX').value.trim(); s.yelp=document.getElementById('hpYelp').value.trim();
+  s.heroVideo=document.getElementById('hpVideo').value.trim();
   document.getElementById('hpSizeV').textContent=Math.round(sz*100)+'%';
   document.getElementById('hpLsV').textContent=ls+'px';
   document.getElementById('hpLhV').textContent=lh.toFixed(2);
@@ -455,9 +472,10 @@ function mImgRemove(i,j){ const arr=data.merch[i].images||[]; arr.splice(j,1); p
 function uploadPhotos(ev){
   const files=[...ev.target.files]; if(!files.length)return;
   let done=0;
+  const arr=curArr();
   files.forEach(f=>{
     resizeImg(f, 1100, (dataUrl)=>{
-      data.gallery.unshift({img:dataUrl, cap:f.name.replace(/\.[^.]+$/,'')});
+      arr.unshift({img:dataUrl, cap:f.name.replace(/\.[^.]+$/,'')});
       done++;
       if(done===files.length){
         try{ persist(); }catch(e){ showToast('Storage full — remove a few photos'); }

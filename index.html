@@ -63,6 +63,9 @@
 
   /* hero */
   .hero{position:relative;min-height:86vh;display:flex;align-items:center;overflow:hidden}
+  .hero-video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;pointer-events:none}
+  .hero-tint{position:absolute;inset:0;z-index:1;pointer-events:none;
+    background:linear-gradient(90deg,rgba(244,238,224,.86) 0%,rgba(244,238,224,.72) 42%,rgba(244,238,224,.5) 100%)}
   .map-corner{position:absolute;top:50%;right:-4%;transform:translateY(-50%);
     width:min(108vw,1180px);height:128%;z-index:1;
     background:url("https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/9dc02fe2-92c1-4687-a22b-172e13ce6b9c/mid+century+map.png") right center / contain no-repeat;
@@ -94,11 +97,22 @@
   .film .bars.top{top:0}.film .bars.bottom{bottom:0}
   .film .grain{position:absolute;inset:0;z-index:3;opacity:.12;pointer-events:none;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");}
-  .film .quote{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;cursor:pointer}
+  .film .quote{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
   .film .quote .mark{font-family:'DM Serif Display',serif;color:var(--ochre);font-size:70px;line-height:.4;opacity:.85}
-  .film .quote blockquote{font-family:'DM Serif Display',serif;font-style:italic;color:#fdf6e7;font-size:clamp(22px,3.4vw,40px);max-width:780px;margin:18px 0 18px;text-shadow:0 2px 18px rgba(0,0,0,.4);transition:opacity .5s}
-  .film .quote .by{color:#f0e4cf;font-weight:600;letter-spacing:.5px;transition:opacity .5s}
+  .film .quote blockquote{font-family:'DM Serif Display',serif;font-style:italic;color:#fdf6e7;font-size:clamp(22px,3.4vw,40px);max-width:780px;margin:18px 0 18px;text-shadow:0 2px 18px rgba(0,0,0,.4);transition:opacity .8s ease}
+  .film .quote .by{color:#f0e4cf;font-weight:600;letter-spacing:.5px;transition:opacity .8s ease}
+  .film .quote .src{transition:opacity .8s ease}
   .film .quote .src{color:var(--ochre);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-top:6px}
+
+  /* the taproom gallery */
+  .tap-gallery{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+  .tap-gallery .tp{position:relative;aspect-ratio:4/3;border-radius:14px;overflow:hidden;cursor:pointer;background:var(--card);box-shadow:0 6px 18px rgba(58,47,36,.10)}
+  .tap-gallery .tp img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s ease}
+  .tap-gallery .tp:hover img{transform:scale(1.06)}
+  .tap-gallery .tp .cap{position:absolute;left:0;right:0;bottom:0;padding:22px 14px 12px;color:#fff;font-weight:600;font-size:14px;background:linear-gradient(transparent,rgba(20,16,11,.62));opacity:0;transition:opacity .25s}
+  .tap-gallery .tp:hover .cap{opacity:1}
+  @media(max-width:860px){.tap-gallery{grid-template-columns:repeat(2,1fr)}}
+  @media(max-width:520px){.tap-gallery{grid-template-columns:1fr}}
   .film .hint{position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(253,246,231,.6);font-size:12px;letter-spacing:1px}
 
   /* section shell */
@@ -259,7 +273,7 @@
   <div class="wrap nav-inner">
     <a class="nav-logo" href="#top"><img src="assets/logo-dark.png" alt="Five Point Five Brewing Co" /></a>
     <nav class="nav-links">
-      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#merch">Merch</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#visit">Visit</a>
+      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#merch">Merch</a><a href="#taproom">Taproom</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#visit">Visit</a>
     </nav>
     <a class="btn btn-primary" href="reservations.html">Make a Reservation</a>
     <button class="menu-toggle" onclick="document.querySelector('header.nav').classList.toggle('open')">≡</button>
@@ -407,18 +421,17 @@
 </script>
 
 <!-- FILM / QUOTE -->
-<section class="film" id="film" title="Click the quote for another">
+<section class="film" id="film">
   <div class="bars top"></div>
   <div class="poster" id="film-poster"></div>
   <div class="grain"></div>
-  <div class="quote" id="quote-box" onclick="nextQuote()">
+  <div class="quote" id="quote-box">
     <div class="mark">&ldquo;</div>
     <blockquote id="q-text"></blockquote>
     <div class="by" id="q-by"></div>
     <div class="src" id="q-src"></div>
   </div>
   <div class="bars bottom"></div>
-  <div class="hint">tap quote for another</div>
 </section>
 
 <!-- ON TAP -->
@@ -458,6 +471,16 @@
       <div><span class="eyebrow">What's On</span><h2 class="display">Upcoming Events</h2></div>
     </div>
     <div class="events" id="events-list"></div>
+  </div>
+</section>
+
+<!-- THE TAPROOM -->
+<section class="block above" id="taproom">
+  <div class="wrap">
+    <div class="sec-head">
+      <div><span class="eyebrow">Step inside</span><h2 class="display">The Taproom</h2></div>
+    </div>
+    <div class="tap-gallery" id="taproom-grid"></div>
   </div>
 </section>
 
@@ -615,7 +638,12 @@ const DEFAULT_DATA = {
     {d:"Friday – Saturday", h:"12:00 PM – 10:00 PM"},
     {d:"Sunday", h:"12:00 PM – 8:00 PM"}
   ],
-  settings:{ albumUrl:"" }
+  taproom:[
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/56c33e45-af03-4405-ad0e-b0e0263c5d0d/tempImagetItOKC.jpg", cap:"The taproom"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Inside"},
+    {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", cap:"The patio"}
+  ],
+  settings:{ albumUrl:"", heroVideo:"" }
 };
 
 let SITE=null;
@@ -634,7 +662,7 @@ async function boot(){
   render();
 }
 
-let GAL=[], MANUAL=[], QUOTES=[], qIndex=0;
+let GAL=[], MANUAL=[], QUOTES=[], TAP=[], qIndex=0;
 const PILE_SIZE=30; let pilePage=0;
 function pilePages(){ return Math.max(1, Math.ceil(GAL.length/PILE_SIZE)); }
 
@@ -685,6 +713,16 @@ function evChip(e){ const d=evDateObj(e); if(d) return {mo:EV_MO[d.getMonth()], 
 const DEFAULT_HERO_TITLE="Your favorite\nbrewery's *favorite\nbrewery.*";
 const DEFAULT_HERO_LEAD="Hand crafted beer inspired by our little 5.5 square mile corner of paradise.";
 function heroHTML(t){ return (t||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*([^*]+)\*/g,'<span class="l2">$1</span>').replace(/\n/g,'<br>'); }
+const DEFAULT_HERO_VIDEO="assets/tower.mp4";
+const DEFAULT_HERO_POSTER="assets/tower-poster.jpg";
+function heroVideoHTML(url,poster){
+  url=(url||'').trim();
+  const yt=url.match(/(?:youtube\.com\/watch\?v=|youtu\.be\/|youtube\.com\/embed\/)([\w-]{11})/);
+  if(yt){ const id=yt[1];
+    const src='https://www.youtube.com/embed/'+id+'?autoplay=1&mute=1&controls=0&loop=1&playlist='+id+'&modestbranding=1&rel=0&playsinline=1&disablekb=1';
+    return '<iframe class="hero-video" src="'+src+'" frameborder="0" allow="autoplay; encrypted-media" tabindex="-1"></iframe>'; }
+  return '<video class="hero-video" autoplay muted loop playsinline preload="auto"'+(poster?' poster="'+poster+'"':'')+'><source src="'+url+'"></video>';
+}
 function applyHero(d){
   const s=(d&&d.settings)||{};
   const h1=document.querySelector('.hero h1');
@@ -694,6 +732,16 @@ function applyHero(d){
     h1.style.lineHeight=(s.heroLine||0.96); }
   const lead=document.querySelector('.hero .lead');
   if(lead){ lead.textContent=(s.heroLead!=null?s.heroLead:DEFAULT_HERO_LEAD); }
+  // Background video behind the title (paper-tinted so the title stays readable)
+  const hero=document.querySelector('.hero');
+  if(hero){
+    hero.querySelectorAll('.hero-video,.hero-tint').forEach(e=>e.remove());
+    const hv=(s.heroVideo!=null?s.heroVideo:DEFAULT_HERO_VIDEO).trim();
+    const poster=(hv===DEFAULT_HERO_VIDEO)?DEFAULT_HERO_POSTER:'';
+    const mc=hero.querySelector('.map-corner');
+    if(hv){ hero.insertAdjacentHTML('afterbegin', heroVideoHTML(hv,poster)+'<div class="hero-tint"></div>'); if(mc) mc.style.display='none'; }
+    else if(mc){ mc.style.display=''; }
+  }
 }
 const DEFAULT_SOCIAL={ig:"https://www.instagram.com/fivepointfivebrewing",fb:"http://facebook.com/fivepointfivebrewing",x:"https://twitter.com/5point5brewing",yelp:"https://www.yelp.com/biz/five-point-five-brewing-el-segundo-2"};
 function applySocials(d){
@@ -737,7 +785,7 @@ function layoutPile(){
     let top  = Math.round(Math.max(0, Math.min(H-size, cy-size/2)));
     const rot=(r3-0.5)*34, z=Math.round(r3*100);
     return `<div class="photo" style="left:${left}px;top:${top}px;width:${size}px;height:${size}px;transform:rotate(${rot}deg);z-index:${z}"
-      onclick="openLB(${gi})" onmouseenter="this.style.transform='rotate(0deg) scale(1.06)'" onmouseleave="this.style.transform='rotate(${rot}deg)'">
+      onclick="openPile(${gi})" onmouseenter="this.style.transform='rotate(0deg) scale(1.06)'" onmouseleave="this.style.transform='rotate(${rot}deg)'">
       <div class="ph" style="background-image:url('${g.img}')"></div></div>`;
   }).join('');
   if(note) note.textContent = total>PILE_SIZE ? `Showing ${start+1}–${start+count} of ${total} · batch ${pilePage+1}/${pilePages()} — tap a photo, or load more` : 'Tap a photo to take a closer look ✦';
@@ -762,6 +810,9 @@ function render(){
       <div class="body"><div class="top"><h3>${m.name||''}</h3>${price?`<span class="price">${price}</span>`:''}</div>
       <p>${m.desc||''}</p><span class="shop">View →</span></div></a>`;
   }).join('') || '<div style="color:var(--muted)">Merch coming soon.</div>';
+  TAP=d.taproom||[];
+  document.getElementById('taproom-grid').innerHTML = TAP.map((t,i)=>`
+    <div class="tp" onclick="openTap(${i})"><img src="${t.img}" alt="${(t.cap||'').replace(/"/g,'&quot;')}" loading="lazy">${t.cap?`<div class="cap">${t.cap}</div>`:''}</div>`).join('') || '<div style="color:var(--muted)">Photos coming soon.</div>';
   pilePage=0;
   layoutPile();
   loadAlbumPhotos();   // pull iCloud shared album if configured; merges with manual uploads
@@ -794,18 +845,25 @@ function render(){
     posterEl.style.display='none';
   } else { posterEl.style.backgroundImage=`url('${FILM_POSTER}')`; }
 
-  qIndex = QUOTES.length ? (Math.floor(Date.now()/3600000)%QUOTES.length) : 0;
+  qIndex = 0;
   showQuote();
+  clearInterval(window._quoteTimer);
+  window._quoteTimer = setInterval(()=>{
+    if(QUOTES.length<2) return;
+    qIndex=(qIndex+1)%QUOTES.length; showQuote();
+  }, 7500);
 }
 
+// Cross-dissolve: fade the current quote out, swap text, fade the new one in.
 function showQuote(){
   const q=QUOTES[qIndex]; if(!q)return;
   const t=document.getElementById('q-text'), by=document.getElementById('q-by'), src=document.getElementById('q-src');
-  t.style.opacity=0; by.style.opacity=0;
-  setTimeout(()=>{ t.textContent=q.text; by.textContent='— '+(q.by||''); src.textContent=q.src||''; t.style.opacity=1; by.style.opacity=1; },180);
+  t.style.opacity=0; by.style.opacity=0; src.style.opacity=0;
+  setTimeout(()=>{
+    t.textContent=q.text; by.textContent='— '+(q.by||''); src.textContent=q.src||'';
+    t.style.opacity=1; by.style.opacity=1; src.style.opacity=1;
+  }, 800);
 }
-function nextQuote(){ if(!QUOTES.length)return; qIndex=(qIndex+1)%QUOTES.length; showQuote(); }
-setInterval(()=>{ if(!QUOTES.length)return; const i=Math.floor(Date.now()/3600000)%QUOTES.length; if(i!==qIndex){qIndex=i;showQuote();} },60000);
 
 // Pull photos from the iCloud shared album via /api/photos (Vercel function).
 // Album photos show first, then any manually-uploaded ones. Falls back silently
@@ -824,10 +882,12 @@ async function loadAlbumPhotos(){
   }catch(e){ /* offline / not deployed yet — keep manual photos */ }
 }
 
-let lbIndex=0;
-function openLB(i){ lbIndex=i; showLB(); document.getElementById('lightbox').classList.add('open'); }
-function showLB(){ const g=GAL[lbIndex]; if(!g)return; document.getElementById('lb-img').src=g.img; document.getElementById('lb-cap').textContent=g.cap||''; }
-function stepLB(n){ lbIndex=(lbIndex+n+GAL.length)%GAL.length; showLB(); }
+let LB=[], lbIndex=0;
+function openLB(arr,i){ LB=arr||[]; lbIndex=i; showLB(); document.getElementById('lightbox').classList.add('open'); }
+function openPile(i){ openLB(GAL,i); }
+function openTap(i){ openLB(TAP,i); }
+function showLB(){ const g=LB[lbIndex]; if(!g)return; document.getElementById('lb-img').src=g.img; document.getElementById('lb-cap').textContent=g.cap||''; }
+function stepLB(n){ if(!LB.length)return; lbIndex=(lbIndex+n+LB.length)%LB.length; showLB(); }
 function closeLB(){ document.getElementById('lightbox').classList.remove('open'); }
 document.addEventListener('keydown',e=>{ if(!document.getElementById('lightbox').classList.contains('open'))return; if(e.key==='Escape')closeLB(); if(e.key==='ArrowRight')stepLB(1); if(e.key==='ArrowLeft')stepLB(-1); });
 document.getElementById('lightbox').addEventListener('click',e=>{ if(e.target.id==='lightbox')closeLB(); });
