@@ -59,6 +59,7 @@
   .nav-links{display:flex;align-items:center;gap:28px}
   .nav-links a{font-weight:600;font-size:15px;color:var(--ink-soft);transition:color .15s}
   .nav-links a:hover{color:var(--terra)}
+  .nav-links .nav-reserve{display:none}
   .menu-toggle{display:none;background:none;border:none;color:var(--ink);font-size:26px;cursor:pointer}
 
   /* hero */
@@ -114,6 +115,22 @@
   .tap-gallery .tp:hover .cap{opacity:1}
   @media(max-width:860px){.tap-gallery{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:520px){.tap-gallery{grid-template-columns:1fr}}
+
+  /* about / staff */
+  .about-soon{text-align:center;color:var(--ink-soft);font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(22px,3vw,32px);padding:30px 0}
+  .about-intro{display:grid;grid-template-columns:1fr 1.35fr;gap:34px;align-items:center;margin-bottom:10px}
+  .about-intro .about-pic img{width:100%;border-radius:16px;object-fit:cover;box-shadow:0 10px 26px rgba(58,47,36,.16);display:block}
+  .about-intro .about-text p{font-size:17px;line-height:1.75;color:var(--ink-soft);margin:0 0 14px}
+  .about-intro .about-text p:last-child{margin-bottom:0}
+  .staff-head{font-family:'DM Serif Display',serif;font-size:clamp(22px,3vw,28px);margin:38px 0 20px;text-align:center}
+  .staff-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:18px}
+  .staff{text-align:center}
+  .staff-photo{aspect-ratio:1/1;border-radius:14px;overflow:hidden;background:var(--card);box-shadow:0 6px 16px rgba(58,47,36,.12);margin-bottom:12px;display:flex;align-items:center;justify-content:center;color:var(--muted);font-size:30px}
+  .staff-photo img{width:100%;height:100%;object-fit:cover}
+  .staff-name{font-weight:700;font-size:16px}
+  .staff-role{font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--terra);font-weight:700;margin-top:2px}
+  .staff-bio{font-size:13px;color:var(--ink-soft);margin-top:7px;line-height:1.55}
+  @media(max-width:860px){.about-intro{grid-template-columns:1fr;gap:20px}.staff-grid{grid-template-columns:repeat(2,1fr)}}
   .film .hint{position:absolute;bottom:54px;left:50%;transform:translateX(-50%);z-index:5;color:rgba(253,246,231,.6);font-size:12px;letter-spacing:1px}
 
   /* section shell */
@@ -235,6 +252,7 @@
     .nav.open .nav-links{max-height:380px;padding:6px 24px 16px}
     .nav-links a{padding:13px 2px;border-bottom:1px solid var(--line);font-size:16px;width:100%}
     .nav .btn-primary{display:none}   /* remove the reservation button from the mobile top bar */
+    .nav-links .nav-reserve{display:block;margin-top:8px;background:var(--terra);color:#fff !important;text-align:center;border-radius:10px;border-bottom:none;font-weight:700;padding:13px}
     .menu-toggle{display:block}
     .hero-top{justify-content:center}
     .visit{grid-template-columns:1fr}
@@ -274,7 +292,7 @@
   <div class="wrap nav-inner">
     <a class="nav-logo" href="#top"><img src="assets/logo-dark.png" alt="Five Point Five Brewing Co" /></a>
     <nav class="nav-links">
-      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#merch">Merch</a><a href="#taproom">Taproom</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#visit">Visit</a>
+      <a href="#tap">Beer</a><a href="#pizza">Pizza</a><a href="#merch">Merch</a><a href="#taproom">Taproom</a><a href="#gallery">Photos</a><a href="#events">Events</a><a href="#about">About</a><a href="#visit">Visit</a><a href="reservations.html" class="nav-reserve">Make a Reservation</a>
     </nav>
     <a class="btn btn-primary" href="reservations.html">Make a Reservation</a>
     <button class="menu-toggle" onclick="document.querySelector('header.nav').classList.toggle('open')">≡</button>
@@ -497,6 +515,14 @@
   </div>
 </section>
 
+<!-- ABOUT -->
+<section class="block above" id="about">
+  <div class="wrap">
+    <div class="sec-head"><div><span class="eyebrow">Who we are</span><h2 class="display">About Us</h2></div></div>
+    <div id="about-body"></div>
+  </div>
+</section>
+
 <!-- VISIT -->
 <section class="block above" id="visit">
   <div class="wrap">
@@ -567,7 +593,6 @@
   <div class="lbcap" id="lb-cap"></div>
 </div>
 
-<div class="editnote above">Demo preview — content is editable in <a href="admin.html">the admin dashboard →</a></div>
 
 <script>
 const VIDEO_URL = "";
@@ -644,6 +669,8 @@ const DEFAULT_DATA = {
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Inside"},
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", cap:"The patio"}
   ],
+  about:{ text:"", img:"" },
+  staff:[],
   settings:{ albumUrl:"", heroVideo:"" }
 };
 
@@ -752,6 +779,46 @@ function applySocials(d){
 }
 function rand(seed){ const x=Math.sin(seed*99.13)*10000; return x-Math.floor(x); }
 
+const eH=s=>(s||'').toString().replace(/&/g,'&amp;').replace(/</g,'&lt;');
+function renderAbout(d){
+  const ab=d.about||{}, staff=d.staff||[];
+  const body=document.getElementById('about-body'); if(!body) return;
+  const hasAbout=((ab.text||'').trim()) || ab.img;
+  const hasStaff=staff.length>0;
+  if(!hasAbout && !hasStaff){ body.innerHTML='<div class="about-soon">Working on it… ✦</div>'; return; }
+  let html='';
+  if(hasAbout){
+    const pic=ab.img?`<div class="about-pic"><img src="${ab.img}" alt="About Five Point Five"></div>`:'';
+    const txt=(ab.text||'').split(/\n+/).filter(Boolean).map(p=>`<p>${eH(p)}</p>`).join('');
+    html+=`<div class="about-intro">${pic}<div class="about-text">${txt}</div></div>`;
+  }
+  if(hasStaff){
+    html+='<div class="staff-head">Meet the team</div><div class="staff-grid">'+staff.map(s=>`
+      <div class="staff"><div class="staff-photo">${s.img?`<img src="${s.img}" alt="${eH(s.name)}">`:'👤'}</div>
+        <div class="staff-name">${eH(s.name)}</div>${s.role?`<div class="staff-role">${eH(s.role)}</div>`:''}${s.bio?`<div class="staff-bio">${eH(s.bio)}</div>`:''}</div>`).join('')+'</div>';
+  }
+  body.innerHTML=html;
+}
+
+// Reorder / show-hide the main content sections from the admin Layout tab.
+const MOVABLE_SECTIONS=['tap','pizza','merch','taproom','events','gallery','about','visit'];
+function applySectionOrder(d){
+  const s=(d&&d.settings)||{};
+  let order=(s.sectionOrder&&s.sectionOrder.length)?s.sectionOrder.slice():MOVABLE_SECTIONS.slice();
+  MOVABLE_SECTIONS.forEach(k=>{ if(order.indexOf(k)<0) order.push(k); });
+  const anchor=document.getElementById('reserve');
+  if(!anchor) return;
+  const parent=anchor.parentNode;
+  const hidden=s.sectionHidden||{};
+  order.forEach(k=>{
+    const el=document.getElementById(k); if(!el) return;
+    el.style.display = hidden[k] ? 'none' : '';
+    parent.insertBefore(el, anchor);
+    const link=document.querySelector('.nav-links a[href="#'+k+'"]');
+    if(link) link.style.display = hidden[k] ? 'none' : '';
+  });
+}
+
 function layoutPile(){
   const pile=document.getElementById('pile');
   const note=document.getElementById('pile-note'), moreBtn=document.getElementById('moreBtn');
@@ -814,6 +881,8 @@ function render(){
   TAP=d.taproom||[];
   document.getElementById('taproom-grid').innerHTML = TAP.map((t,i)=>`
     <div class="tp" onclick="openTap(${i})"><img src="${t.img}" alt="${(t.cap||'').replace(/"/g,'&quot;')}" loading="lazy">${t.cap?`<div class="cap">${t.cap}</div>`:''}</div>`).join('') || '<div style="color:var(--muted)">Photos coming soon.</div>';
+  renderAbout(d);
+  applySectionOrder(d);
   pilePage=0;
   layoutPile();
   loadAlbumPhotos();   // pull iCloud shared album if configured; merges with manual uploads
@@ -849,10 +918,12 @@ function render(){
   qIndex = 0;
   showQuote();
   clearInterval(window._quoteTimer);
+  let qSecs=parseFloat((d.settings&&d.settings.quoteSecs));
+  if(!(qSecs>=1 && qSecs<=10)) qSecs=7;
   window._quoteTimer = setInterval(()=>{
     if(QUOTES.length<2) return;
     qIndex=(qIndex+1)%QUOTES.length; showQuote();
-  }, 7500);
+  }, qSecs*1000);
 }
 
 // Cross-dissolve the whole quote as a single layer (avoids mobile text-shadow ghosting).

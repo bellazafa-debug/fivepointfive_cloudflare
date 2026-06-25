@@ -110,10 +110,12 @@
     <button class="tab" data-tab="merch" onclick="switchTab('merch')">🧢 Merch</button>
     <button class="tab" data-tab="taproom" onclick="switchTab('taproom')">🏛 Taproom</button>
     <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
+    <button class="tab" data-tab="about" onclick="switchTab('about')">👋 About</button>
     <button class="tab" data-tab="quotes" onclick="switchTab('quotes')">💬 Quotes</button>
     <button class="tab" data-tab="events" onclick="switchTab('events')">📅 Events</button>
     <button class="tab" data-tab="pastevents" onclick="switchTab('pastevents')">🗂 Past Events</button>
     <button class="tab" data-tab="hours" onclick="switchTab('hours')">🕒 Hours</button>
+    <button class="tab" data-tab="layout" onclick="switchTab('layout')">🧩 Layout</button>
     <button class="tab" data-tab="analytics" onclick="switchTab('analytics')">📊 Analytics</button>
   </div>
 
@@ -140,7 +142,31 @@
         <button class="btn btn-primary" onclick="addItem()">+ Add new</button>
       </div>
     </div>
+    <div id="aboutIntro" style="display:none">
+      <div class="card" style="margin-bottom:14px">
+        <label>About Us paragraph</label>
+        <textarea id="abText" rows="5" oninput="abUpdate()" placeholder="Tell your story… (press Enter twice to start a new paragraph)"></textarea>
+        <label style="display:block;margin-top:12px">Photo (optional)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <img id="abImgPrev" style="width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid var(--line);display:none">
+          <input id="abImg" oninput="abUpdate()" placeholder="Paste URL or upload →" style="flex:1;min-width:0">
+          <button type="button" class="btn btn-ghost btn-sm" style="flex:none" onclick="document.getElementById('abImgFile').click()">⬆ Upload</button>
+          <input type="file" id="abImgFile" accept="image/*" style="display:none" onchange="abUpload(event)">
+        </div>
+      </div>
+      <div style="font-weight:700;margin:16px 2px 8px;font-size:15px">👥 Staff lineup <span style="font-weight:400;color:var(--muted);font-size:13px">— each person is a square with photo, name, role &amp; bio. Add with “＋ Add new”.</span></div>
+    </div>
+    <div id="quotesCtrl" style="display:none">
+      <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
+        <label style="margin:0">Seconds each review shows · <b><span id="qSecsV"></span>s</b></label>
+        <input type="range" id="qSecs" min="1" max="10" step="0.5" oninput="qSecsUpdate()" style="flex:1;min-width:180px">
+      </div>
+    </div>
     <div id="list"></div>
+    <div id="layoutPanel" style="display:none">
+      <div style="color:var(--muted);font-size:13px;margin-bottom:14px">Use ▲▼ to reorder how sections appear on the homepage, and untick <b>Show</b> to hide one. The hero, reviews and reservation band always stay put.</div>
+      <div id="layoutList"></div>
+    </div>
     <div id="homepagePanel" style="display:none">
       <div class="card" style="margin-bottom:14px">
         <label>Big title</label>
@@ -254,6 +280,8 @@ const DEFAULT_DATA = {
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/c3fd30eb-c2f7-414c-8974-9927d914dae7/IMG_4687.jpg", cap:"Inside"},
     {img:"https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/5be48b60-4831-4746-9757-0a4702352a3b/world+cup+1.jpg", cap:"The patio"}
   ],
+  about:{ text:"", img:"" },
+  staff:[],
   settings:{ albumUrl:"", heroVideo:"" }
 };
 
@@ -265,6 +293,7 @@ const SCHEMA = {
   merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["images","Photos (carousel — first one is the thumbnail)","images"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   taproom:[["cap","Caption (optional)","input"],["img","Photo","image"]],
+  staff:[["name","Name","input"],["role","Role / title (e.g. Head Brewer)","input"],["bio","Short bio","textarea"],["img","Photo","image"]],
   quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
   events:[["date","Date","date"],["end","Ends at (optional — auto-hides after this time)","time"],["title","Event title","input"],["when","When (shown text, e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
   hours:[["d","Days","input"],["h","Hours","input"]]
@@ -276,6 +305,8 @@ const TITLES = {
   merch:["Merch","Shop items shown in the Merch section. Add a photo (or video), price and description."],
   gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
   taproom:["The Taproom","Professional photos of your space. Shows in the clean grid gallery. Upload or paste a photo, add an optional caption."],
+  about:["About Us","Your story and staff lineup. Add a paragraph and photo up top, then add each team member as a square below. Leave both empty to show a “Working on it…” placeholder."],
+  layout:["Section Layout","Reorder and show/hide the homepage sections. Changes go live when you Publish."],
   quotes:["Quotes","Rotating reviews & quotes shown over the video. Changes hourly. Replace samples with your real Yelp/Google reviews."],
   events:["Upcoming Events","Each event gets its own page. Once the date (and end time) passes, it moves to Past Events automatically."],
   pastevents:["Past Events","Events that have ended. Hit ↻ Renew to set a new date and bring one back as upcoming."],
@@ -283,7 +314,7 @@ const TITLES = {
   analytics:["Analytics","Traffic at a glance — views, unique visitors, devices and where people come from."],
   homepage:["Homepage Hero","Edit the big front-page title and subtitle, and fine-tune the size and spacing."]
 };
-const SOURCE={ pastevents:'events' };
+const SOURCE={ pastevents:'events', about:'staff' };
 const FILTER={ events:(e)=>!evPast(e), pastevents:(e)=>evPast(e) };
 function srcKey(){ return SOURCE[current]||current; }
 function curArr(){ return data[srcKey()]; }
@@ -294,6 +325,7 @@ const BLANK = {
   merch:{name:"New item",price:"",desc:"",images:[],video:"",link:"",linkLabel:""},
   gallery:{cap:"New photo",img:""},
   taproom:{cap:"",img:""},
+  staff:{name:"New teammate",role:"",bio:"",img:""},
   quotes:{text:"New quote",by:"",src:""},
   events:{id:"",date:"",end:"",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
   hours:{d:"Day",h:"Hours"}
@@ -333,18 +365,98 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
   document.getElementById('panel-title').textContent=TITLES[t][0];
   document.getElementById('panel-desc').textContent=TITLES[t][1];
-  const isA = (t==='analytics'), isH = (t==='homepage');
+  const isA=(t==='analytics'), isH=(t==='homepage'), isL=(t==='layout'), isAb=(t==='about'), isQ=(t==='quotes');
   document.getElementById('analyticsPanel').style.display = isA ? 'block' : 'none';
   document.getElementById('homepagePanel').style.display = isH ? 'block' : 'none';
-  document.getElementById('list').style.display = (isA||isH) ? 'none' : 'block';
-  document.getElementById('headBtns').style.display = (isA||isH||t==='pastevents') ? 'none' : 'flex';
+  document.getElementById('layoutPanel').style.display = isL ? 'block' : 'none';
+  document.getElementById('aboutIntro').style.display = isAb ? 'block' : 'none';
+  document.getElementById('quotesCtrl').style.display = isQ ? 'block' : 'none';
+  document.getElementById('list').style.display = (isA||isH||isL) ? 'none' : 'block';
+  document.getElementById('headBtns').style.display = (isA||isH||isL||t==='pastevents') ? 'none' : 'flex';
   document.getElementById('upBtn').style.display = (t==='gallery'||t==='taproom') ? 'inline-flex' : 'none';
   const ab=document.getElementById('albumBox');
   if(ab){ ab.style.display = (t==='gallery') ? 'block' : 'none';
     if(t==='gallery'){ data.settings=data.settings||{albumUrl:''}; document.getElementById('albumUrl').value=data.settings.albumUrl||''; } }
   if(isA){ loadStats(statsDays); return; }
   if(isH){ loadHomeControls(); return; }
+  if(isL){ loadLayout(); return; }
+  if(isAb){ loadAbout(); }
+  if(isQ){ loadQuoteSecs(); }
   renderList();
+}
+
+/* ---- About Us intro (paragraph + photo) ---- */
+function loadAbout(){
+  data.about = data.about || {text:"",img:""};
+  document.getElementById('abText').value = data.about.text||'';
+  document.getElementById('abImg').value = data.about.img||'';
+  const p=document.getElementById('abImgPrev');
+  if(data.about.img){ p.src=data.about.img; p.style.display=''; } else { p.style.display='none'; }
+}
+function abUpdate(){
+  data.about = data.about || {text:"",img:""};
+  data.about.text = document.getElementById('abText').value;
+  data.about.img  = document.getElementById('abImg').value.trim();
+  const p=document.getElementById('abImgPrev');
+  if(data.about.img){ p.src=data.about.img; p.style.display=''; } else { p.style.display='none'; }
+  persist();
+}
+function abUpload(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  resizeImg(f, 1400, (dataUrl)=>{ document.getElementById('abImg').value=dataUrl; abUpdate(); showToast('Photo added ✓'); });
+  ev.target.value='';
+}
+
+/* ---- Quotes cycle time ---- */
+function loadQuoteSecs(){
+  data.settings = data.settings || {};
+  const v = (data.settings.quoteSecs>=1 && data.settings.quoteSecs<=10) ? data.settings.quoteSecs : 7;
+  document.getElementById('qSecs').value = v;
+  document.getElementById('qSecsV').textContent = v;
+}
+function qSecsUpdate(){
+  data.settings = data.settings || {};
+  const v=+document.getElementById('qSecs').value;
+  data.settings.quoteSecs = v;
+  document.getElementById('qSecsV').textContent = v;
+  persist();
+}
+
+/* ---- Section layout (reorder + show/hide) ---- */
+const MOVABLE_SECTIONS=['tap','pizza','merch','taproom','events','gallery','about','visit'];
+const SECTION_LABELS={tap:'🍺 Beer / On Tap',pizza:'🍕 Pizza',merch:'🧢 Merch',taproom:'🏛 The Taproom',events:'📅 Events',gallery:'📷 Photo Box',about:'👋 About Us',visit:'📍 Hours & Location'};
+function loadLayout(){
+  const s=data.settings||(data.settings={});
+  if(!s.sectionOrder || !s.sectionOrder.length) s.sectionOrder=MOVABLE_SECTIONS.slice();
+  MOVABLE_SECTIONS.forEach(k=>{ if(s.sectionOrder.indexOf(k)<0) s.sectionOrder.push(k); });
+  s.sectionOrder = s.sectionOrder.filter(k=>MOVABLE_SECTIONS.indexOf(k)>=0);
+  s.sectionHidden = s.sectionHidden || {};
+  renderLayout();
+}
+function renderLayout(){
+  const s=data.settings, order=s.sectionOrder, hidden=s.sectionHidden||{};
+  document.getElementById('layoutList').innerHTML = order.map((k,i)=>`
+    <div class="card" style="display:flex;align-items:center;gap:14px;margin-bottom:8px">
+      <div style="display:flex;flex-direction:column;gap:3px">
+        <button class="btn btn-ghost btn-sm" ${i===0?'disabled':''} onclick="moveSection(${i},-1)">▲</button>
+        <button class="btn btn-ghost btn-sm" ${i===order.length-1?'disabled':''} onclick="moveSection(${i},1)">▼</button>
+      </div>
+      <div class="grow" style="font-weight:600;font-size:15px">${SECTION_LABELS[k]||k}</div>
+      <label style="display:flex;align-items:center;gap:8px;cursor:pointer;text-transform:none;letter-spacing:0;font-weight:600;color:var(--ink);margin:0">
+        <input type="checkbox" ${hidden[k]?'':'checked'} onchange="toggleSection('${k}',this.checked)" style="width:18px;height:18px"> Show
+      </label>
+    </div>`).join('');
+}
+function moveSection(i,dir){
+  const o=data.settings.sectionOrder, j=i+dir;
+  if(j<0||j>=o.length) return;
+  const tmp=o[i]; o[i]=o[j]; o[j]=tmp;
+  persist(); renderLayout();
+}
+function toggleSection(k,show){
+  data.settings.sectionHidden = data.settings.sectionHidden || {};
+  if(show) delete data.settings.sectionHidden[k]; else data.settings.sectionHidden[k]=true;
+  persist(); renderLayout();
 }
 
 /* ---- Homepage hero controls ---- */
