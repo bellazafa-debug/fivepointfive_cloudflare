@@ -97,7 +97,8 @@
   .film .bars.top{top:0}.film .bars.bottom{bottom:0}
   .film .grain{position:absolute;inset:0;z-index:3;opacity:.12;pointer-events:none;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='g'><feTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23g)'/></svg>");}
-  .film .quote{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px}
+  .film .quote{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;
+    transition:opacity .7s ease;will-change:opacity;transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
   .film .quote .mark{font-family:'DM Serif Display',serif;color:var(--ochre);font-size:70px;line-height:.4;opacity:.85}
   .film .quote blockquote{font-family:'DM Serif Display',serif;font-style:italic;color:#fdf6e7;font-size:clamp(22px,3.4vw,40px);max-width:780px;margin:18px 0 18px;text-shadow:0 2px 18px rgba(0,0,0,.4);transition:opacity .8s ease}
   .film .quote .by{color:#f0e4cf;font-weight:600;letter-spacing:.5px;transition:opacity .8s ease}
@@ -854,15 +855,19 @@ function render(){
   }, 7500);
 }
 
-// Cross-dissolve: fade the current quote out, swap text, fade the new one in.
+// Cross-dissolve the whole quote as a single layer (avoids mobile text-shadow ghosting).
 function showQuote(){
   const q=QUOTES[qIndex]; if(!q)return;
+  const box=document.getElementById('quote-box');
   const t=document.getElementById('q-text'), by=document.getElementById('q-by'), src=document.getElementById('q-src');
-  t.style.opacity=0; by.style.opacity=0; src.style.opacity=0;
-  setTimeout(()=>{
-    t.textContent=q.text; by.textContent='— '+(q.by||''); src.textContent=q.src||'';
-    t.style.opacity=1; by.style.opacity=1; src.style.opacity=1;
-  }, 800);
+  const swap=()=>{ t.textContent=q.text; by.textContent='— '+(q.by||''); src.textContent=q.src||''; };
+  if(box.dataset.init){
+    box.style.opacity=0;
+    clearTimeout(box._t);
+    box._t=setTimeout(()=>{ swap(); box.style.opacity=1; }, 700);
+  } else {
+    swap(); box.dataset.init='1'; box.style.opacity=1;
+  }
 }
 
 // Pull photos from the iCloud shared album via /api/photos (Vercel function).
