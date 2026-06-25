@@ -101,9 +101,8 @@
   .film .quote{position:absolute;inset:0;z-index:5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:40px;
     transition:opacity .7s ease;will-change:opacity;transform:translateZ(0);-webkit-backface-visibility:hidden;backface-visibility:hidden}
   .film .quote .mark{font-family:'DM Serif Display',serif;color:var(--ochre);font-size:70px;line-height:.4;opacity:.85}
-  .film .quote blockquote{font-family:'DM Serif Display',serif;font-style:italic;color:#fdf6e7;font-size:clamp(22px,3.4vw,40px);max-width:780px;margin:18px 0 18px;text-shadow:0 2px 18px rgba(0,0,0,.4);transition:opacity .8s ease}
-  .film .quote .by{color:#f0e4cf;font-weight:600;letter-spacing:.5px;transition:opacity .8s ease}
-  .film .quote .src{transition:opacity .8s ease}
+  .film .quote blockquote{font-family:'DM Serif Display',serif;font-style:italic;color:#fdf6e7;font-size:clamp(22px,3.4vw,40px);max-width:780px;margin:18px 0 18px;text-shadow:0 2px 18px rgba(0,0,0,.4)}
+  .film .quote .by{color:#f0e4cf;font-weight:600;letter-spacing:.5px}
   .film .quote .src{color:var(--ochre);font-size:13px;letter-spacing:2px;text-transform:uppercase;margin-top:6px}
 
   /* the taproom gallery */
@@ -244,15 +243,13 @@
   .socials a:hover{border-color:var(--ochre);color:var(--ochre)}
   .copy{border-top:1px solid #5b4d3c;padding-top:24px;color:#c9bca6;font-size:13px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:10px}
 
-  .editnote{position:fixed;bottom:18px;left:18px;z-index:800;background:var(--card);border:1px solid var(--terra);color:var(--ink);padding:11px 16px;border-radius:12px;font-size:13px;box-shadow:0 12px 30px rgba(58,47,36,.22)}
-  .editnote a{color:var(--terra);font-weight:700}
 
   @media(max-width:860px){
     .nav-links{display:flex;flex-direction:column;gap:0;position:absolute;top:100%;left:0;right:0;background:var(--paper);border-bottom:1px solid var(--line);box-shadow:0 14px 26px rgba(58,47,36,.16);max-height:0;overflow:hidden;transition:max-height .3s ease;padding:0 24px;z-index:899}
     .nav.open .nav-links{max-height:85vh;overflow-y:auto;padding:6px 24px 16px}
     .nav-links a{padding:13px 2px;border-bottom:1px solid var(--line);font-size:16px;width:100%}
     .nav .btn-primary{display:none}   /* remove the reservation button from the mobile top bar */
-    .nav-links .nav-reserve{display:block;margin-top:8px;background:var(--terra);color:#fff !important;text-align:center;border-radius:10px;border-bottom:none;font-weight:700;padding:13px}
+    .nav-links .nav-reserve{display:block;color:var(--terra);font-weight:700}
     .menu-toggle{display:block}
     .hero-top{justify-content:center}
     .visit{grid-template-columns:1fr}
