@@ -28,6 +28,7 @@
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html{scroll-behavior:smooth}
+  section[id]{scroll-margin-top:74px}
   body{background:var(--paper);color:var(--ink);font-family:'Inter',system-ui,sans-serif;-webkit-font-smoothing:antialiased;line-height:1.55;overflow-x:hidden;position:relative}
   body::before{content:"";position:fixed;inset:0;z-index:1;pointer-events:none;opacity:.45;mix-blend-mode:multiply;
     background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='200' height='200'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix type='saturate' values='0'/></filter><rect width='100%25' height='100%25' filter='url(%23n)' opacity='0.05'/></svg>");}
@@ -685,7 +686,18 @@ async function boot(){
     if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ SITE=mergeDefaults(d); } }
   }catch(e){}
   render();
+  // Content + section order are applied in render(); if we arrived with a #hash
+  // (e.g. a nav link from another page), jump to the right spot now that the
+  // sections are in their final order.
+  scrollToHash('auto');
+  setTimeout(()=>scrollToHash('auto'), 250);  // again once images settle
 }
+function scrollToHash(behavior){
+  if(!location.hash) return;
+  let el; try{ el=document.querySelector(location.hash); }catch(e){ return; }
+  if(el) el.scrollIntoView({behavior:behavior||'auto', block:'start'});
+}
+window.addEventListener('load', ()=>scrollToHash('auto'));
 
 let GAL=[], MANUAL=[], QUOTES=[], TAP=[], qIndex=0;
 const PILE_SIZE=30; let pilePage=0;
