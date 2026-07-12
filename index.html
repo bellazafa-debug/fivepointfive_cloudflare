@@ -116,6 +116,11 @@
   @media(max-width:860px){.tap-gallery{grid-template-columns:repeat(2,1fr)}}
   @media(max-width:520px){.tap-gallery{grid-template-columns:1fr}}
 
+  /* custom html / embeds */
+  .embed-block{margin-bottom:26px}
+  .embed-block:last-child{margin-bottom:0}
+  .embed-block > h2{margin-bottom:18px}
+
   /* about / staff */
   .about-soon{text-align:center;color:var(--ink-soft);font-family:'DM Serif Display',serif;font-style:italic;font-size:clamp(22px,3vw,32px);padding:30px 0}
   .about-intro{display:grid;grid-template-columns:1fr 1.35fr;gap:34px;align-items:center;margin-bottom:10px}
@@ -513,6 +518,11 @@
   </div>
 </section>
 
+<!-- CUSTOM HTML / EMBEDS -->
+<section class="block above" id="embed" style="display:none">
+  <div class="wrap"><div id="embed-body"></div></div>
+</section>
+
 <!-- ABOUT -->
 <section class="block above" id="about">
   <div class="wrap">
@@ -669,6 +679,7 @@ const DEFAULT_DATA = {
   ],
   about:{ text:"", img:"" },
   staff:[],
+  embeds:[],
   settings:{ albumUrl:"", heroVideo:"" }
 };
 
@@ -809,8 +820,31 @@ function renderAbout(d){
   body.innerHTML=html;
 }
 
+// Custom HTML / embed blocks. Re-creates <script> tags so real embeds actually run.
+function setHTMLWithScripts(container, html){
+  container.innerHTML = html || '';
+  container.querySelectorAll('script').forEach(old=>{
+    const s=document.createElement('script');
+    for(const a of old.attributes) s.setAttribute(a.name, a.value);
+    s.textContent = old.textContent;
+    old.replaceWith(s);
+  });
+}
+function renderEmbeds(d){
+  const body=document.getElementById('embed-body'); if(!body) return;
+  const blocks=(d.embeds||[]).filter(b=>b && (b.html||'').trim());
+  body.innerHTML='';
+  blocks.forEach(b=>{
+    const wrap=document.createElement('div'); wrap.className='embed-block';
+    if((b.title||'').trim()){ const h=document.createElement('h2'); h.className='display'; h.textContent=b.title; wrap.appendChild(h); }
+    const holder=document.createElement('div'); setHTMLWithScripts(holder, b.html); wrap.appendChild(holder);
+    body.appendChild(wrap);
+  });
+}
+function hasEmbeds(d){ return (d.embeds||[]).some(b=>b && (b.html||'').trim()); }
+
 // Reorder / show-hide the main content sections from the admin Layout tab.
-const MOVABLE_SECTIONS=['tap','pizza','merch','taproom','events','gallery','about','visit'];
+const MOVABLE_SECTIONS=['tap','pizza','merch','taproom','events','gallery','embed','about','visit'];
 function applySectionOrder(d){
   const s=(d&&d.settings)||{};
   let order=(s.sectionOrder&&s.sectionOrder.length)?s.sectionOrder.slice():MOVABLE_SECTIONS.slice();
@@ -821,10 +855,12 @@ function applySectionOrder(d){
   const hidden=s.sectionHidden||{};
   order.forEach(k=>{
     const el=document.getElementById(k); if(!el) return;
-    el.style.display = hidden[k] ? 'none' : '';
+    // the custom-HTML section only shows when it actually has content
+    const off = hidden[k] || (k==='embed' && !hasEmbeds(d));
+    el.style.display = off ? 'none' : '';
     parent.insertBefore(el, anchor);
     const link=document.querySelector('.nav-links a[href="#'+k+'"]');
-    if(link) link.style.display = hidden[k] ? 'none' : '';
+    if(link) link.style.display = off ? 'none' : '';
   });
 }
 
@@ -890,6 +926,7 @@ function render(){
   TAP=d.taproom||[];
   document.getElementById('taproom-grid').innerHTML = TAP.map((t,i)=>`
     <div class="tp" onclick="openTap(${i})"><img src="${t.img}" alt="${(t.cap||'').replace(/"/g,'&quot;')}" loading="lazy">${t.cap?`<div class="cap">${t.cap}</div>`:''}</div>`).join('') || '<div style="color:var(--muted)">Photos coming soon.</div>';
+  renderEmbeds(d);
   renderAbout(d);
   applySectionOrder(d);
   pilePage=0;

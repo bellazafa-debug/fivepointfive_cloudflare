@@ -111,6 +111,7 @@
     <button class="tab" data-tab="taproom" onclick="switchTab('taproom')">🏛 Taproom</button>
     <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
     <button class="tab" data-tab="about" onclick="switchTab('about')">👋 About</button>
+    <button class="tab" data-tab="embeds" onclick="switchTab('embeds')">&lt;/&gt; Custom HTML</button>
     <button class="tab" data-tab="quotes" onclick="switchTab('quotes')">💬 Quotes</button>
     <button class="tab" data-tab="events" onclick="switchTab('events')">📅 Events</button>
     <button class="tab" data-tab="pastevents" onclick="switchTab('pastevents')">🗂 Past Events</button>
@@ -282,6 +283,7 @@ const DEFAULT_DATA = {
   ],
   about:{ text:"", img:"" },
   staff:[],
+  embeds:[],
   settings:{ albumUrl:"", heroVideo:"" }
 };
 
@@ -294,6 +296,7 @@ const SCHEMA = {
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   taproom:[["cap","Caption (optional)","input"],["img","Photo","image"]],
   staff:[["name","Name","input"],["role","Role / title (e.g. Head Brewer)","input"],["bio","Short bio","textarea"],["img","Photo","image"]],
+  embeds:[["title","Heading (optional — shown above the block)","input"],["html","HTML / embed code (paste from the other service)","textarea"]],
   quotes:[["text","Quote","textarea"],["by","Attributed to (e.g. A regular)","input"],["src","Source badge (e.g. Yelp ★★★★★)","input"]],
   events:[["date","Date","date"],["end","Ends at (optional — auto-hides after this time)","time"],["title","Event title","input"],["when","When (shown text, e.g. Thursday · 7:00 PM)","input"],["blurb","Short blurb (shown on the card)","textarea"],["body","Full description (event page)","textarea"],["img","Photo","input"],["video","Video / media URL (optional — YouTube or .mp4)","input"],["link","Custom button link (optional — external sign-up / tickets)","input"],["linkLabel","Custom button label (e.g. Register, Tickets)","input"],["reserveBtn","Add a “Make a Reservation” button (links to our reservation page)","checkbox"]],
   hours:[["d","Days","input"],["h","Hours","input"]]
@@ -306,6 +309,7 @@ const TITLES = {
   gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
   taproom:["The Taproom","Professional photos of your space. Shows in the clean grid gallery. Upload or paste a photo, add an optional caption."],
   about:["About Us","Your story and staff lineup. Add a paragraph and photo up top, then add each team member as a square below. Leave both empty to show a “Working on it…” placeholder."],
+  embeds:["Custom HTML","Paste any HTML or embed code (forms, widgets, maps, etc.) — it renders as its own section. Add multiple blocks; position the whole section with the Layout tab. Only paste code from sources you trust."],
   layout:["Section Layout","Reorder and show/hide the homepage sections. Changes go live when you Publish."],
   quotes:["Quotes","Rotating reviews & quotes shown over the video. Changes hourly. Replace samples with your real Yelp/Google reviews."],
   events:["Upcoming Events","Each event gets its own page. Once the date (and end time) passes, it moves to Past Events automatically."],
@@ -326,6 +330,7 @@ const BLANK = {
   gallery:{cap:"New photo",img:""},
   taproom:{cap:"",img:""},
   staff:{name:"New teammate",role:"",bio:"",img:""},
+  embeds:{title:"",html:""},
   quotes:{text:"New quote",by:"",src:""},
   events:{id:"",date:"",end:"",title:"New event",when:"",blurb:"",body:"",img:"",video:"",link:"",linkLabel:"",reserveBtn:false},
   hours:{d:"Day",h:"Hours"}
@@ -423,8 +428,8 @@ function qSecsUpdate(){
 }
 
 /* ---- Section layout (reorder + show/hide) ---- */
-const MOVABLE_SECTIONS=['tap','pizza','merch','taproom','events','gallery','about','visit'];
-const SECTION_LABELS={tap:'🍺 Beer / On Tap',pizza:'🍕 Pizza',merch:'🧢 Merch',taproom:'🏛 The Taproom',events:'📅 Events',gallery:'📷 Photo Box',about:'👋 About Us',visit:'📍 Hours & Location'};
+const MOVABLE_SECTIONS=['tap','pizza','merch','taproom','events','gallery','embed','about','visit'];
+const SECTION_LABELS={tap:'🍺 Beer / On Tap',pizza:'🍕 Pizza',merch:'🧢 Merch',taproom:'🏛 The Taproom',events:'📅 Events',gallery:'📷 Photo Box',embed:'</> Custom HTML',about:'👋 About Us',visit:'📍 Hours & Location'};
 function loadLayout(){
   const s=data.settings||(data.settings={});
   if(!s.sectionOrder || !s.sectionOrder.length) s.sectionOrder=MOVABLE_SECTIONS.slice();
