@@ -200,8 +200,8 @@
   /* lightbox */
   #lightbox{position:fixed;inset:0;z-index:9990;background:rgba(34,26,18,.93);display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px}
   #lightbox.open{display:flex}
-  #lightbox .frame{background:var(--polaroid);padding:10px;border-radius:3px;max-width:min(86vw,720px);box-shadow:0 30px 60px rgba(0,0,0,.5);transform:rotate(-1.2deg)}
-  #lightbox .frame img{width:100%;max-height:68vh;object-fit:contain;background:#000}
+  #lightbox .frame{background:var(--polaroid);padding:10px;border-radius:3px;width:min(86vw,720px);box-shadow:0 30px 60px rgba(0,0,0,.5);transform:rotate(-1.2deg)}
+  #lightbox .frame img{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;background:#000}
   #lightbox .lbcap{font-weight:600;text-align:center;padding:16px;color:#f0e4cf}
   #lightbox .x{position:absolute;top:22px;right:26px;font-size:34px;color:#fff;cursor:pointer;line-height:1}
   #lightbox .arrow{position:absolute;top:50%;transform:translateY(-50%);font-size:46px;color:#fff;cursor:pointer;user-select:none;padding:10px;opacity:.8}
