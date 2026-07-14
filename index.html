@@ -193,15 +193,15 @@
   .pile{position:relative;width:100%;margin-top:8px}
   .photo{position:absolute;background:var(--polaroid);padding:6px;border-radius:2px;
     box-shadow:0 7px 16px rgba(40,30,18,.32);cursor:pointer;transition:transform .16s ease, box-shadow .16s ease;will-change:transform}
-  .photo .ph{display:block;width:100%;height:100%;object-fit:cover;background:#cdbf9f;filter:saturate(.9) contrast(1.04) sepia(.1)}
+  .photo .ph{width:100%;height:100%;background:#cdbf9f center/cover no-repeat;filter:saturate(.9) contrast(1.04) sepia(.1)}
   .photo:hover{box-shadow:0 18px 34px rgba(40,30,18,.45);z-index:999 !important}
   .pile-note{text-align:center;color:var(--ink-soft);font-size:13px;margin-top:18px;letter-spacing:.3px}
 
   /* lightbox */
   #lightbox{position:fixed;inset:0;z-index:9990;background:rgba(34,26,18,.93);display:none;align-items:center;justify-content:center;flex-direction:column;padding:24px}
   #lightbox.open{display:flex}
-  #lightbox .frame{background:var(--polaroid);padding:10px;border-radius:3px;width:min(86vw,720px);box-shadow:0 30px 60px rgba(0,0,0,.5);transform:rotate(-1.2deg)}
-  #lightbox .frame img{display:block;width:100%;height:auto;max-height:72vh;object-fit:contain;background:#000}
+  #lightbox .frame{background:var(--polaroid);padding:10px;border-radius:3px;box-shadow:0 30px 60px rgba(0,0,0,.5);transform:rotate(-1.2deg)}
+  #lightbox .frame img{display:block;max-width:86vw;max-height:78vh;width:auto;height:auto}
   #lightbox .lbcap{font-weight:600;text-align:center;padding:16px;color:#f0e4cf}
   #lightbox .x{position:absolute;top:22px;right:26px;font-size:34px;color:#fff;cursor:pointer;line-height:1}
   #lightbox .arrow{position:absolute;top:50%;transform:translateY(-50%);font-size:46px;color:#fff;cursor:pointer;user-select:none;padding:10px;opacity:.8}
@@ -656,7 +656,7 @@ function heroVideoHTML(url,poster){
   if(yt){ const id=yt[1];
     const src='https://www.youtube.com/embed/'+id+'?autoplay=1&mute=1&controls=0&loop=1&playlist='+id+'&modestbranding=1&rel=0&playsinline=1&disablekb=1';
     return '<iframe class="hero-video" src="'+src+'" frameborder="0" allow="autoplay; encrypted-media" tabindex="-1"></iframe>'; }
-  return '<video class="hero-video" autoplay muted loop playsinline preload="metadata"'+(poster?' poster="'+poster+'"':'')+'><source src="'+url+'"></video>';
+  return '<video class="hero-video" autoplay muted loop playsinline preload="auto"'+(poster?' poster="'+poster+'"':'')+'><source src="'+url+'"></video>';
 }
 function applyHero(d){
   const s=(d&&d.settings)||{};
@@ -786,7 +786,7 @@ function layoutPile(){
     const rot=(r3-0.5)*34, z=Math.round(r3*100);
     return `<div class="photo" style="left:${left}px;top:${top}px;width:${size}px;height:${size}px;transform:rotate(${rot}deg);z-index:${z}"
       onclick="openPile(${gi})" onmouseenter="this.style.transform='rotate(0deg) scale(1.06)'" onmouseleave="this.style.transform='rotate(${rot}deg)'">
-      <img class="ph" loading="lazy" decoding="async" src="${g.img}" alt=""></div>`;
+      <div class="ph" style="background-image:url('${g.img}')"></div></div>`;
   }).join('');
   if(note) note.textContent = total>PILE_SIZE ? `Showing ${start+1}–${start+count} of ${total} · batch ${pilePage+1}/${pilePages()} — tap a photo, or load more` : 'Tap a photo to take a closer look ✦';
   if(moreBtn) moreBtn.style.display = total>PILE_SIZE ? 'inline-flex' : 'none';
@@ -895,7 +895,7 @@ let LB=[], lbIndex=0;
 function openLB(arr,i){ LB=arr||[]; lbIndex=i; showLB(); document.getElementById('lightbox').classList.add('open'); }
 function openPile(i){ openLB(GAL,i); }
 function openTap(i){ openLB(TAP,i); }
-function showLB(){ const g=LB[lbIndex]; if(!g)return; document.getElementById('lb-img').src=(g.full||g.img); document.getElementById('lb-cap').textContent=g.cap||''; }
+function showLB(){ const g=LB[lbIndex]; if(!g)return; document.getElementById('lb-img').src=g.img; document.getElementById('lb-cap').textContent=g.cap||''; }
 function stepLB(n){ if(!LB.length)return; lbIndex=(lbIndex+n+LB.length)%LB.length; showLB(); }
 function closeLB(){ document.getElementById('lightbox').classList.remove('open'); }
 document.addEventListener('keydown',e=>{ if(!document.getElementById('lightbox').classList.contains('open'))return; if(e.key==='Escape')closeLB(); if(e.key==='ArrowRight')stepLB(1); if(e.key==='ArrowLeft')stepLB(-1); });
