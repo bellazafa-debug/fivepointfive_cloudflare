@@ -580,9 +580,28 @@ function getData(){
 // Load live, shared content from the database (falls back to local/defaults offline).
 async function boot(){
   try{
-    const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'});
-    if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ SITE=mergeDefaults(d); } }
-  }catch(e){}
+    // Served by the Cloudflare Function, which caches at the edge (see functions/api/content.js).
+    // Response shape is { data: {...} } — not the raw Supabase array.
+    const r = await fetch('/api/content');
+    if(r.ok){
+      const j = await r.json();
+      const d = j && j.data;
+      if(d && Object.keys(d).length){ SITE = mergeDefaults(d); }
+    } else {
+      throw new Error('api/content ' + r.status);
+    }
+  }catch(e){
+    // Fallback: if the Function is unavailable, talk to Supabase directly so the
+    // site still shows live content rather than built-in defaults.
+    try{
+      const r2 = await fetch(SB_URL + '/rest/v1/site_content?id=eq.1&select=data', { headers: SB_H });
+      if(r2.ok){
+        const rows = await r2.json();
+        const d2 = rows && rows[0] && rows[0].data;
+        if(d2 && Object.keys(d2).length){ SITE = mergeDefaults(d2); }
+      }
+    }catch(e2){}
+  }
   render();
   // Content + section order are applied in render(); if we arrived with a #hash
   // (e.g. a nav link from another page), jump to the right spot now that the
