@@ -88,6 +88,7 @@ const esc=(s)=>String(s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'
 function getId(){ return new URLSearchParams(location.search).get('id')||''; }
 async function getMerch(){
   try{ const r=await fetch('/api/content'); if(r.ok){ const j=await r.json(); const d=j&&j.data; if(d&&d.merch&&d.merch.length) return d.merch; } }catch(e){}
+  try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.merch&&d.merch.length) return d.merch; } }catch(e){}
   return DEFAULT_MERCH;
 }
 let IMGS=[], cur=0;
