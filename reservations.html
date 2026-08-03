@@ -210,7 +210,7 @@ function getHours(){ try{const s=localStorage.getItem('fpf_site_data'); if(s){co
 function renderHours(hrs){ document.getElementById('hoursList').innerHTML = (hrs||[]).map(h=>`<div class="hours-row"><span class="d">${h.d}</span><span>${h.h}</span></div>`).join(''); }
 renderHours(getHours());
 // refresh hours from the live published content (direct from the database)
-(async()=>{ try{ const r=await fetch('/api/content'); if(r.ok){ const j=await r.json(); const d=j&&j.data; if(d&&d.hours) renderHours(d.hours); } }catch(e){} })();
+(async()=>{ try{ const r=await fetch('/api/content'); if(r.ok){ const j=await r.json(); const d=j&&j.data; if(d&&d.hours){ renderHours(d.hours); return; } } }catch(e){} try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.hours) renderHours(d.hours); } }catch(e){} })();
 document.getElementById('yr').textContent=new Date().getFullYear();
 
 // Date: min = today
