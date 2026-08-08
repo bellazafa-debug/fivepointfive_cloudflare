@@ -45,11 +45,22 @@
   .btn-ghost:hover{background:var(--ink);color:var(--paper);transform:translateY(-2px)}
 
   /* age gate */
-  #agegate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+  #agegate{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;align-items:center;justify-content:center;text-align:center;padding:24px;overflow-y:auto}
+  #agegate .gate-inner{display:flex;align-items:center;justify-content:center;gap:clamp(24px,5vw,64px);max-width:1080px;width:100%}
+  #agegate .gate-media{display:none;flex:0 0 auto}
+  #agegate.has-graphic .gate-media{display:block}
+  #agegate .gate-media img{display:block;width:min(44vw,480px);height:auto;border-radius:10px}
   #agegate .box{max-width:460px;position:relative;z-index:3}
-  #agegate img{width:88px;margin:0 auto 24px}
+  #agegate .gate-logo{width:88px;margin:0 auto 24px}
   #agegate h2{font-size:clamp(34px,7vw,52px)}
   #agegate p{color:var(--muted);margin:14px 0 30px}
+  @media(max-width:820px){
+    #agegate .gate-inner{flex-direction:column;gap:22px}
+    #agegate.has-graphic .gate-media img{width:auto;max-width:82vw;max-height:44vh}
+    #agegate.has-graphic .gate-logo{width:64px;margin-bottom:16px}
+    #agegate.has-graphic h2{font-size:clamp(28px,6.5vw,40px)}
+    #agegate.has-graphic p{margin:10px 0 20px}
+  }
   .gate-row{display:flex;gap:14px;justify-content:center;flex-wrap:wrap}
 
   /* nav */
@@ -275,13 +286,16 @@
 
 <!-- AGE GATE -->
 <div id="agegate">
-  <div class="box">
-    <img src="https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/89dfbb95-1764-4b6a-9569-8ce6cf9cf0ac/icon-cmyk.png?format=1500w" alt="Five Point Five" />
-    <h2 class="display">Are you<br>over 21?</h2>
-    <p>You must be of legal drinking age to enter.</p>
-    <div class="gate-row">
-      <button class="btn btn-primary" onclick="passGate()">Yes, I'm 21+</button>
-      <a class="btn btn-ghost" href="https://www.responsibility.org">No</a>
+  <div class="gate-inner">
+    <div class="gate-media"><img id="gate-graphic" src="" alt=""></div>
+    <div class="box">
+      <img class="gate-logo" src="https://images.squarespace-cdn.com/content/v1/64b1e07b5f8feb5469acb55e/89dfbb95-1764-4b6a-9569-8ce6cf9cf0ac/icon-cmyk.png?format=1500w" alt="Five Point Five" />
+      <h2 class="display">Are you<br>over 21?</h2>
+      <p>You must be of legal drinking age to enter.</p>
+      <div class="gate-row">
+        <button class="btn btn-primary" onclick="passGate()">Yes, I'm 21+</button>
+        <a class="btn btn-ghost" href="https://www.responsibility.org">No</a>
+      </div>
     </div>
   </div>
 </div>
@@ -567,7 +581,7 @@ const DEFAULT_DATA = {
   about:{ text:"", img:"" },
   staff:[],
   embeds:[],
-  settings:{ albumUrl:"", heroVideo:"" }
+  settings:{ albumUrl:"", heroVideo:"", ageGraphic:"" }
 };
 
 let SITE=null;
@@ -580,28 +594,9 @@ function getData(){
 // Load live, shared content from the database (falls back to local/defaults offline).
 async function boot(){
   try{
-    // Served by the Cloudflare Function, which caches at the edge (see functions/api/content.js).
-    // Response shape is { data: {...} } — not the raw Supabase array.
-    const r = await fetch('/api/content');
-    if(r.ok){
-      const j = await r.json();
-      const d = j && j.data;
-      if(d && Object.keys(d).length){ SITE = mergeDefaults(d); }
-    } else {
-      throw new Error('api/content ' + r.status);
-    }
-  }catch(e){
-    // Fallback: if the Function is unavailable, talk to Supabase directly so the
-    // site still shows live content rather than built-in defaults.
-    try{
-      const r2 = await fetch(SB_URL + '/rest/v1/site_content?id=eq.1&select=data', { headers: SB_H });
-      if(r2.ok){
-        const rows = await r2.json();
-        const d2 = rows && rows[0] && rows[0].data;
-        if(d2 && Object.keys(d2).length){ SITE = mergeDefaults(d2); }
-      }
-    }catch(e2){}
-  }
+    const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'});
+    if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&Object.keys(d).length){ SITE=mergeDefaults(d); } }
+  }catch(e){}
   render();
   // Content + section order are applied in render(); if we arrived with a #hash
   // (e.g. a nav link from another page), jump to the right spot now that the
@@ -702,6 +697,14 @@ function applySocials(d){
   const s=(d&&d.settings)||{};
   const map={instagram:s.ig||DEFAULT_SOCIAL.ig, facebook:s.fb||DEFAULT_SOCIAL.fb, x:s.x||DEFAULT_SOCIAL.x, yelp:s.yelp||DEFAULT_SOCIAL.yelp};
   document.querySelectorAll('.hero-socials a, .socials a').forEach(a=>{ const l=(a.getAttribute('aria-label')||'').toLowerCase(); if(map[l]) a.href=map[l]; });
+}
+function applyAgeGate(d){
+  const s=(d&&d.settings)||{};
+  const g=(s.ageGraphic||'').trim();
+  const gate=document.getElementById('agegate'); if(!gate) return;
+  const img=document.getElementById('gate-graphic');
+  if(g){ if(img) img.src=g; gate.classList.add('has-graphic'); }
+  else { gate.classList.remove('has-graphic'); if(img) img.removeAttribute('src'); }
 }
 function rand(seed){ const x=Math.sin(seed*99.13)*10000; return x-Math.floor(x); }
 
@@ -814,7 +817,7 @@ function morePhotos(){ if(!GAL.length) return; pilePage=(pilePage+1)%pilePages()
 
 function render(){
   const d=getData();
-  applyHero(d); applySocials(d);
+  applyHero(d); applySocials(d); applyAgeGate(d);
   MANUAL=d.gallery||[]; GAL=MANUAL.slice(); QUOTES=d.quotes||[];
   document.getElementById('tap-grid').innerHTML = (d.beers||[]).map(beerCard).join('');
   document.getElementById('seltzer-grid').innerHTML = (d.seltzers||[]).map(beerCard).join('');

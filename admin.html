@@ -197,6 +197,16 @@
         <input id="hpVideo" oninput="hpUpdate()" placeholder="https://… .mp4  (or a YouTube link)">
         <div style="font-size:12px;color:var(--muted);margin-top:6px">Paste a hosted <b>.mp4</b> link (best quality) or a YouTube link — it plays muted on a loop behind the El Segundo tower title. Leave blank for the plain paper hero.</div>
       </div>
+      <div class="card" style="margin-bottom:14px">
+        <label>21+ age-gate graphic / ad (optional)</label>
+        <div style="display:flex;gap:8px;align-items:center">
+          <img id="hpAgePrev" style="width:48px;height:48px;border-radius:8px;object-fit:cover;border:1px solid var(--line);display:none">
+          <input id="hpAge" oninput="hpUpdate()" placeholder="Paste URL or upload →" style="flex:1;min-width:0">
+          <button type="button" class="btn btn-ghost btn-sm" style="flex:none" onclick="document.getElementById('hpAgeFile').click()">⬆ Upload</button>
+          <input type="file" id="hpAgeFile" accept="image/*" style="display:none" onchange="hpAgeUpload(event)">
+        </div>
+        <div style="font-size:12px;color:var(--muted);margin-top:6px">Shows on the “Are you over 21?” page — beside the prompt on desktop, above it on mobile. <b>Best as a square (1:1), ~1000×1000px.</b> Leave blank for no graphic.</div>
+      </div>
       <div style="font-size:12px;letter-spacing:1px;text-transform:uppercase;color:var(--muted);margin:4px 0 8px">Live preview</div>
       <div id="hpPreview" style="background:#f1e8d6;border:1px solid var(--line);border-radius:14px;padding:28px 24px;overflow:hidden"></div>
       <div style="margin-top:14px;color:var(--muted);font-size:13px">When it looks right, hit <b>💾 Publish changes</b> to push it live.</div>
@@ -284,7 +294,7 @@ const DEFAULT_DATA = {
   about:{ text:"", img:"" },
   staff:[],
   embeds:[],
-  settings:{ albumUrl:"", heroVideo:"" }
+  settings:{ albumUrl:"", heroVideo:"", ageGraphic:"" }
 };
 
 // field schema per section: [key, label, type]
@@ -411,6 +421,11 @@ function abUpload(ev){
   resizeImg(f, 1400, (dataUrl)=>{ document.getElementById('abImg').value=dataUrl; abUpdate(); showToast('Photo added ✓'); });
   ev.target.value='';
 }
+function hpAgeUpload(ev){
+  const f=ev.target.files&&ev.target.files[0]; if(!f) return;
+  resizeImg(f, 1200, (dataUrl)=>{ document.getElementById('hpAge').value=dataUrl; hpUpdate(); showToast('Graphic added ✓'); });
+  ev.target.value='';
+}
 
 /* ---- Quotes cycle time ---- */
 function loadQuoteSecs(){
@@ -481,6 +496,7 @@ function loadHomeControls(){
   document.getElementById('hpX').value    = (s.x!=null?s.x:DEFAULT_SOCIAL.x);
   document.getElementById('hpYelp').value = (s.yelp!=null?s.yelp:DEFAULT_SOCIAL.yelp);
   document.getElementById('hpVideo').value = (s.heroVideo!=null?s.heroVideo:DEFAULT_HERO_VIDEO);
+  document.getElementById('hpAge').value = (s.ageGraphic||'');
   hpUpdate();
 }
 function hpUpdate(){
@@ -490,6 +506,8 @@ function hpUpdate(){
   s.heroTitle=t; s.heroLead=l; s.heroScale=sz; s.heroLetter=ls; s.heroLine=lh;
   s.ig=document.getElementById('hpIg').value.trim(); s.fb=document.getElementById('hpFb').value.trim(); s.x=document.getElementById('hpX').value.trim(); s.yelp=document.getElementById('hpYelp').value.trim();
   s.heroVideo=document.getElementById('hpVideo').value.trim();
+  s.ageGraphic=document.getElementById('hpAge').value.trim();
+  const ap=document.getElementById('hpAgePrev'); if(ap){ if(s.ageGraphic){ ap.src=s.ageGraphic; ap.style.display=''; } else { ap.style.display='none'; } }
   document.getElementById('hpSizeV').textContent=Math.round(sz*100)+'%';
   document.getElementById('hpLsV').textContent=ls+'px';
   document.getElementById('hpLhV').textContent=lh.toFixed(2);
