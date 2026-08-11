@@ -71,6 +71,7 @@
   .area-row .rm:hover{border-color:#b4452f;background:#fbeae6}
 
   .hp{position:absolute;left:-9999px}  /* honeypot */
+  #resForm .invalid{border-color:var(--terra) !important;box-shadow:0 0 0 3px rgba(194,116,79,.22);background:#fdf3ec}
   .submit-row{margin-top:8px}
   .submit-row .btn{width:100%;font-size:16px;padding:16px}
   .formnote{font-size:12.5px;color:var(--muted);margin-top:12px;text-align:center}
@@ -152,7 +153,7 @@
           <button type="button" class="btn btn-ghost" id="addAreaBtn" onclick="addArea()" style="margin-top:10px;padding:9px 18px;font-size:13px">+ Add another area</button>
           <input type="hidden" name="areas" id="areasInput" />
         </div>
-        <div class="field full"><label>Anything else? <span class="req">*</span></label><textarea name="notes" required placeholder="High chairs, dog-friendly patio, large group, allergies…"></textarea></div>
+        <div class="field full"><label>Anything else? <span style="text-transform:none;letter-spacing:0;color:var(--muted);font-weight:500">(optional)</span></label><textarea name="notes" placeholder="High chairs, dog-friendly patio, large group, allergies…"></textarea></div>
         <div class="submit-row">
           <button type="submit" class="btn btn-primary" id="submitBtn">Request Reservation →</button>
         </div>
@@ -210,7 +211,7 @@ function getHours(){ try{const s=localStorage.getItem('fpf_site_data'); if(s){co
 function renderHours(hrs){ document.getElementById('hoursList').innerHTML = (hrs||[]).map(h=>`<div class="hours-row"><span class="d">${h.d}</span><span>${h.h}</span></div>`).join(''); }
 renderHours(getHours());
 // refresh hours from the live published content (direct from the database)
-(async()=>{ try{ const r=await fetch('/api/content'); if(r.ok){ const j=await r.json(); const d=j&&j.data; if(d&&d.hours){ renderHours(d.hours); return; } } }catch(e){} try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.hours) renderHours(d.hours); } }catch(e){} })();
+(async()=>{ try{ const r=await fetch(SB_URL+'/rest/v1/site_content?id=eq.1&select=data',{headers:SB_H,cache:'no-store'}); if(r.ok){ const rows=await r.json(); const d=rows&&rows[0]&&rows[0].data; if(d&&d.hours) renderHours(d.hours); } }catch(e){} })();
 document.getElementById('yr').textContent=new Date().getFullYear();
 
 // Date: min = today
@@ -253,11 +254,19 @@ form.addEventListener('submit', async (e)=>{
   if(form.company.value){ return; } // honeypot tripped
   syncAreas();
   const data=Object.fromEntries(new FormData(form).entries());
-  // basic validation — all required except brewery area
-  for(const k of ['name','phone','email','date','time','party','occasion','notes']){
-    if(!data[k] || !String(data[k]).trim()){ showErr('Please fill in all required fields.'); return; }
+  clearInvalid();
+  const REQ=['name','phone','email','date','time','party','occasion'];  // notes is optional
+  const missing=REQ.filter(k=>!data[k]||!String(data[k]).trim());
+  missing.forEach(k=>markInvalid(form.elements[k]));
+  const emailBad = data.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(String(data.email).trim());
+  if(emailBad) markInvalid(form.elements['email']);
+  if(missing.length || emailBad){
+    showErr(missing.length ? 'Please fill in the highlighted fields.' : 'Please enter a valid email address.');
+    const first=form.querySelector('.invalid');
+    if(first){ try{ first.focus({preventScroll:true}); }catch(_){}
+      first.scrollIntoView({behavior:'smooth',block:'center'}); }
+    return;
   }
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(data.email)){ showErr('Please enter a valid email.'); return; }
 
   const btn=document.getElementById('submitBtn');
   btn.disabled=true; btn.textContent='Sending…';
@@ -280,6 +289,9 @@ form.addEventListener('submit', async (e)=>{
   }
 });
 function showErr(m){ errBox.textContent=m; errBox.style.display='block'; }
+function markInvalid(el){ if(!el)return; el.classList.add('invalid'); if(!el._vwired){ el._vwired=1; el.addEventListener('input',clearOne); el.addEventListener('change',clearOne); } }
+function clearOne(e){ e.target.classList.remove('invalid'); }
+function clearInvalid(){ form.querySelectorAll('.invalid').forEach(function(el){ el.classList.remove('invalid'); }); errBox.style.display='none'; }
 function showDone(msg){ if(msg) document.getElementById('doneMsg').textContent=msg; document.getElementById('done').classList.add('show'); }
 (function(){try{
   var v=localStorage.getItem('fpf_vid'); if(!v){v=Date.now().toString(36)+Math.random().toString(36).slice(2,10); localStorage.setItem('fpf_vid',v);}
