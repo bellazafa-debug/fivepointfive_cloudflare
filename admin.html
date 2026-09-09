@@ -106,7 +106,7 @@
     <button class="tab" data-tab="homepage" onclick="switchTab('homepage')">🏠 Homepage</button>
     <button class="tab active" data-tab="beers" onclick="switchTab('beers')">🍺 Beer</button>
     <button class="tab" data-tab="seltzers" onclick="switchTab('seltzers')">🥂 Seltzers</button>
-    <button class="tab" data-tab="pizzas" onclick="switchTab('pizzas')">🍕 Pizza</button>
+    <button class="tab" data-tab="pizzas" onclick="switchTab('pizzas')">🍕 Food &amp; Menu</button>
     <button class="tab" data-tab="merch" onclick="switchTab('merch')">🧢 Merch</button>
     <button class="tab" data-tab="taproom" onclick="switchTab('taproom')">🏛 Taproom</button>
     <button class="tab" data-tab="gallery" onclick="switchTab('gallery')">📷 Photos</button>
@@ -161,6 +161,17 @@
       <div class="card" style="margin-bottom:14px;display:flex;align-items:center;gap:16px;flex-wrap:wrap">
         <label style="margin:0">Seconds each review shows · <b><span id="qSecsV"></span>s</b></label>
         <input type="range" id="qSecs" min="1" max="10" step="0.5" oninput="qSecsUpdate()" style="flex:1;min-width:180px">
+      </div>
+    </div>
+    <div id="foodCtrl" style="display:none">
+      <div class="card" style="margin-bottom:14px">
+        <label>Section title</label>
+        <input id="fdTitle" oninput="foodUpdate()" placeholder="Pi's *by Pi LA*">
+        <div style="font-size:12px;color:var(--muted);margin:4px 0 12px">Rename it to anything — “Food Trucks”, “Kitchen”, “Bar Snacks”, etc. Wrap words in <b>*stars*</b> to color them (e.g. <b>Pi's *by Pi LA*</b>).</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:14px">
+          <div><label>Small kicker above title (optional)</label><input id="fdEyebrow" oninput="foodUpdate()" placeholder="e.g. From the kitchen"></div>
+          <div><label>Top-menu button label</label><input id="fdNav" oninput="foodUpdate()" placeholder="Pizza"></div>
+        </div>
       </div>
     </div>
     <div id="list"></div>
@@ -294,14 +305,14 @@ const DEFAULT_DATA = {
   about:{ text:"", img:"" },
   staff:[],
   embeds:[],
-  settings:{ albumUrl:"", heroVideo:"", ageGraphic:"" }
+  settings:{ albumUrl:"", heroVideo:"", ageGraphic:"", foodEyebrow:"", foodTitle:"Pi's *by Pi LA*", foodNav:"Pizza" }
 };
 
 // field schema per section: [key, label, type]
 const SCHEMA = {
   beers:[["name","Name","input"],["type","Style (e.g. Hazy IPA)","input"],["abv","ABV (e.g. 6.8%)","input"],["tag","Badge — start with 🥇 🥈 🥉 for a medal (e.g. “🥉 2026 Cap Expo”), or plain text like “New”","input"],["logo","Logo image URL","input"],["desc","Description","textarea"]],
   seltzers:[["name","Name","input"],["type","Type","input"],["abv","ABV","input"],["tag","Badge","input"],["desc","Description","textarea"]],
-  pizzas:[["name","Pizza name","input"],["img","Image URL","input"],["desc","Description","textarea"]],
+  pizzas:[["name","Name","input"],["tag","Label (optional — e.g. Food Truck, Bar Snack, Pop-up)","input"],["date","Date (optional — for pop-ups / food trucks)","date"],["price","Price (optional — e.g. $8)","input"],["desc","Description","textarea"],["img","Photo","image"]],
   merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["images","Photos (carousel — first one is the thumbnail)","images"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   taproom:[["cap","Caption (optional)","input"],["img","Photo","image"]],
@@ -314,7 +325,7 @@ const SCHEMA = {
 const TITLES = {
   beers:["Beer","Your tap list. Shows in the \"Our Beers\" section. Edit any cell or add a new beer."],
   seltzers:["Hard Seltzers","Shows under the seltzers row. Add or edit cells freely."],
-  pizzas:["Pi's by Pi LA","Your car-themed pies. Shows in the Pizza section."],
+  pizzas:["Food & Menu","Pizzas, bar snacks, food trucks and pop-ups. Rename the section up top, then add items — each can have an optional label (Food Truck, Bar Snack, Pop-up), date, price and photo."],
   merch:["Merch","Shop items shown in the Merch section. Add a photo (or video), price and description."],
   gallery:["Photo Box","Photos of life at the brewery. Shows in the scattered photo pile."],
   taproom:["The Taproom","Professional photos of your space. Shows in the clean grid gallery. Upload or paste a photo, add an optional caption."],
@@ -335,7 +346,7 @@ function curArr(){ return data[srcKey()]; }
 const BLANK = {
   beers:{name:"New beer",type:"",abv:"",tag:"",logo:"",desc:""},
   seltzers:{name:"New seltzer",type:"Hard Seltzer",abv:"5%",tag:"Seltzer",desc:""},
-  pizzas:{name:"New pizza",img:"",desc:""},
+  pizzas:{name:"New item",tag:"",date:"",price:"",desc:"",img:""},
   merch:{name:"New item",price:"",desc:"",images:[],video:"",link:"",linkLabel:""},
   gallery:{cap:"New photo",img:""},
   taproom:{cap:"",img:""},
@@ -380,12 +391,13 @@ function switchTab(t){
   document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active', b.dataset.tab===t));
   document.getElementById('panel-title').textContent=TITLES[t][0];
   document.getElementById('panel-desc').textContent=TITLES[t][1];
-  const isA=(t==='analytics'), isH=(t==='homepage'), isL=(t==='layout'), isAb=(t==='about'), isQ=(t==='quotes');
+  const isA=(t==='analytics'), isH=(t==='homepage'), isL=(t==='layout'), isAb=(t==='about'), isQ=(t==='quotes'), isP=(t==='pizzas');
   document.getElementById('analyticsPanel').style.display = isA ? 'block' : 'none';
   document.getElementById('homepagePanel').style.display = isH ? 'block' : 'none';
   document.getElementById('layoutPanel').style.display = isL ? 'block' : 'none';
   document.getElementById('aboutIntro').style.display = isAb ? 'block' : 'none';
   document.getElementById('quotesCtrl').style.display = isQ ? 'block' : 'none';
+  document.getElementById('foodCtrl').style.display = isP ? 'block' : 'none';
   document.getElementById('list').style.display = (isA||isH||isL) ? 'none' : 'block';
   document.getElementById('headBtns').style.display = (isA||isH||isL||t==='pastevents') ? 'none' : 'flex';
   document.getElementById('upBtn').style.display = (t==='gallery'||t==='taproom') ? 'inline-flex' : 'none';
@@ -397,7 +409,22 @@ function switchTab(t){
   if(isL){ loadLayout(); return; }
   if(isAb){ loadAbout(); }
   if(isQ){ loadQuoteSecs(); }
+  if(isP){ loadFood(); }
   renderList();
+}
+/* ---- Food / menu section naming ---- */
+function loadFood(){
+  const s=data.settings||(data.settings={});
+  document.getElementById('fdTitle').value = (s.foodTitle!=null?s.foodTitle:"Pi's *by Pi LA*");
+  document.getElementById('fdEyebrow').value = (s.foodEyebrow||'');
+  document.getElementById('fdNav').value = (s.foodNav||'Pizza');
+}
+function foodUpdate(){
+  const s=data.settings||(data.settings={});
+  s.foodTitle=document.getElementById('fdTitle').value;
+  s.foodEyebrow=document.getElementById('fdEyebrow').value;
+  s.foodNav=document.getElementById('fdNav').value.trim()||'Pizza';
+  persist();
 }
 
 /* ---- About Us intro (paragraph + photo) ---- */

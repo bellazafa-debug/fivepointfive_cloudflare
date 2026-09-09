@@ -179,8 +179,13 @@
   .pizza .img{aspect-ratio:1/1;background:radial-gradient(circle at 50% 40%, #fff7e9, var(--paper-deep));display:flex;align-items:center;justify-content:center}
   .pizza .img img{width:80%;height:80%;object-fit:contain}
   .pizza .body{padding:20px 22px 24px}
-  .pizza h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:24px;margin-bottom:8px;line-height:1}
-  .pizza p{color:var(--ink-soft);font-size:14px}
+  .pizza h3{font-family:'Anton',sans-serif;font-weight:400;text-transform:uppercase;font-size:24px;line-height:1}
+  .pizza p{color:var(--ink-soft);font-size:14px;margin-top:8px}
+  .pizza .meta-row{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px}
+  .pizza .tag-chip{background:var(--terra);color:#fff7ee;font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+  .pizza .date-chip-sm{background:var(--paper-deep,#e9dcc3);color:var(--ink-soft);font-size:11px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:4px 10px;border-radius:999px}
+  .pizza .top{display:flex;justify-content:space-between;align-items:baseline;gap:12px}
+  .pizza .top .price{font-family:'Anton',sans-serif;color:var(--terra);font-size:19px;white-space:nowrap}
 
   /* ---------- Merch ---------- */
   .merch-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:20px}
@@ -373,7 +378,7 @@
 <section class="block above" id="pizza">
   <div class="wrap">
     <div class="sec-head">
-      <div><h2 class="display">Pi's <span class="by">by Pi LA</span></h2></div>
+      <div><span class="eyebrow" id="food-eyebrow" style="display:none"></span><h2 class="display" id="food-title">Pi's <span class="by">by Pi LA</span></h2></div>
     </div>
     <div class="pizza-grid" id="pizza-grid"></div>
   </div>
@@ -581,7 +586,7 @@ const DEFAULT_DATA = {
   about:{ text:"", img:"" },
   staff:[],
   embeds:[],
-  settings:{ albumUrl:"", heroVideo:"", ageGraphic:"" }
+  settings:{ albumUrl:"", heroVideo:"", ageGraphic:"", foodEyebrow:"", foodTitle:"Pi's *by Pi LA*", foodNav:"Pizza" }
 };
 
 let SITE=null;
@@ -697,6 +702,20 @@ function applySocials(d){
   const s=(d&&d.settings)||{};
   const map={instagram:s.ig||DEFAULT_SOCIAL.ig, facebook:s.fb||DEFAULT_SOCIAL.fb, x:s.x||DEFAULT_SOCIAL.x, yelp:s.yelp||DEFAULT_SOCIAL.yelp};
   document.querySelectorAll('.hero-socials a, .socials a').forEach(a=>{ const l=(a.getAttribute('aria-label')||'').toLowerCase(); if(map[l]) a.href=map[l]; });
+}
+const DEFAULT_FOOD_TITLE="Pi's *by Pi LA*";
+function fmtFoodDate(s){ if(!s) return ''; const p=String(s).split('-'); if(p.length<3) return s; const d=new Date(+p[0],+p[1]-1,+p[2]); if(isNaN(d.getTime())) return s; return d.toLocaleDateString('en-US',{weekday:'short',month:'short',day:'numeric'}); }
+function applyFood(d){
+  const s=(d&&d.settings)||{};
+  const eb=document.getElementById('food-eyebrow');
+  const eyebrow=(s.foodEyebrow!=null?s.foodEyebrow:'');
+  if(eb){ if(String(eyebrow).trim()){ eb.textContent=eyebrow; eb.style.display=''; } else { eb.style.display='none'; } }
+  const ttl=document.getElementById('food-title');
+  const title=(s.foodTitle!=null?s.foodTitle:DEFAULT_FOOD_TITLE);
+  if(ttl){ ttl.innerHTML=(title||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/\*([^*]+)\*/g,'<span class="by">$1</span>'); }
+  const navLabel=(s.foodNav||'Pizza');
+  const nav=document.querySelector('.nav-links a[href="#pizza"]'); if(nav) nav.textContent=navLabel;
+  const fnav=document.querySelector('.foot-col a[href="#pizza"]'); if(fnav) fnav.textContent=navLabel;
 }
 function applyAgeGate(d){
   const s=(d&&d.settings)||{};
@@ -821,9 +840,13 @@ function render(){
   MANUAL=d.gallery||[]; GAL=MANUAL.slice(); QUOTES=d.quotes||[];
   document.getElementById('tap-grid').innerHTML = (d.beers||[]).map(beerCard).join('');
   document.getElementById('seltzer-grid').innerHTML = (d.seltzers||[]).map(beerCard).join('');
-  document.getElementById('pizza-grid').innerHTML = (d.pizzas||[]).map(p=>`
-    <div class="pizza"><div class="img">${p.img?`<img src="${p.img}" alt="${p.name}">`:''}</div>
-      <div class="body"><h3>${p.name}</h3><p>${p.desc||''}</p></div></div>`).join('');
+  applyFood(d);
+  document.getElementById('pizza-grid').innerHTML = (d.pizzas||[]).map(p=>{
+    const price = p.price ? (/^\s*\$/.test(p.price)?p.price:'$'+p.price) : '';
+    const meta = (p.tag||p.date) ? `<div class="meta-row">${p.tag?`<span class="tag-chip">${eH(p.tag)}</span>`:''}${p.date?`<span class="date-chip-sm">${fmtFoodDate(p.date)}</span>`:''}</div>` : '';
+    return `<div class="pizza"><div class="img">${p.img?`<img src="${p.img}" alt="${eH(p.name)}">`:''}</div>
+      <div class="body">${meta}<div class="top"><h3>${eH(p.name)}</h3>${price?`<span class="price">${eH(price)}</span>`:''}</div>${p.desc?`<p>${eH(p.desc)}</p>`:''}</div></div>`;
+  }).join('') || '<div style="color:var(--muted)">Menu coming soon.</div>';
   document.getElementById('merch-grid').innerHTML = (d.merch||[]).map(m=>{
     const imgs=(m.images&&m.images.length)?m.images:(m.img?[m.img]:[]);
     const price = m.price ? (/^\s*\$/.test(m.price)?m.price:'$'+m.price) : '';
