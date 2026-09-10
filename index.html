@@ -844,7 +844,8 @@ function render(){
   document.getElementById('pizza-grid').innerHTML = (d.pizzas||[]).map(p=>{
     const price = p.price ? (/^\s*\$/.test(p.price)?p.price:'$'+p.price) : '';
     const meta = (p.tag||p.date) ? `<div class="meta-row">${p.tag?`<span class="tag-chip">${eH(p.tag)}</span>`:''}${p.date?`<span class="date-chip-sm">${fmtFoodDate(p.date)}</span>`:''}</div>` : '';
-    return `<div class="pizza"><div class="img">${p.img?`<img src="${p.img}" alt="${eH(p.name)}">`:''}</div>
+    const imgHtml = p.img ? `<div class="img"><img src="${p.img}" alt="${eH(p.name)}"></div>` : '';
+    return `<div class="pizza${p.img?'':' no-img'}">${imgHtml}
       <div class="body">${meta}<div class="top"><h3>${eH(p.name)}</h3>${price?`<span class="price">${eH(price)}</span>`:''}</div>${p.desc?`<p>${eH(p.desc)}</p>`:''}</div></div>`;
   }).join('') || '<div style="color:var(--muted)">Menu coming soon.</div>';
   document.getElementById('merch-grid').innerHTML = (d.merch||[]).map(m=>{
