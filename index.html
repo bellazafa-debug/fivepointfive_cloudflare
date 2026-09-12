@@ -838,8 +838,8 @@ function render(){
   const d=getData();
   applyHero(d); applySocials(d); applyAgeGate(d);
   MANUAL=d.gallery||[]; GAL=MANUAL.slice(); QUOTES=d.quotes||[];
-  document.getElementById('tap-grid').innerHTML = (d.beers||[]).map(beerCard).join('');
-  document.getElementById('seltzer-grid').innerHTML = (d.seltzers||[]).map(beerCard).join('');
+  document.getElementById('tap-grid').innerHTML = (d.beers||[]).filter(b=>!b.hidden).map(beerCard).join('');
+  document.getElementById('seltzer-grid').innerHTML = (d.seltzers||[]).filter(b=>!b.hidden).map(beerCard).join('');
   applyFood(d);
   document.getElementById('pizza-grid').innerHTML = (d.pizzas||[]).filter(p=>!p.hidden).map(p=>{
     const price = p.price ? (/^\s*\$/.test(p.price)?p.price:'$'+p.price) : '';
