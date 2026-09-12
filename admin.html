@@ -312,7 +312,7 @@ const DEFAULT_DATA = {
 const SCHEMA = {
   beers:[["name","Name","input"],["type","Style (e.g. Hazy IPA)","input"],["abv","ABV (e.g. 6.8%)","input"],["tag","Badge — start with 🥇 🥈 🥉 for a medal (e.g. “🥉 2026 Cap Expo”), or plain text like “New”","input"],["logo","Logo image URL","input"],["desc","Description","textarea"]],
   seltzers:[["name","Name","input"],["type","Type","input"],["abv","ABV","input"],["tag","Badge","input"],["desc","Description","textarea"]],
-  pizzas:[["name","Name","input"],["tag","Label (optional — e.g. Food Truck, Bar Snack, Pop-up)","input"],["date","Date (optional — for pop-ups / food trucks)","date"],["price","Price (optional — e.g. $8)","input"],["desc","Description","textarea"],["img","Photo","image"]],
+  pizzas:[["name","Name","input"],["tag","Label (optional — e.g. Food Truck, Bar Snack, Pop-up)","input"],["date","Date (optional — for pop-ups / food trucks)","date"],["price","Price (optional — e.g. $8)","input"],["desc","Description","textarea"],["img","Photo","image"],["hidden","Hidden — keep it saved but off the site (untick to show it again)","checkbox"]],
   merch:[["name","Item name","input"],["price","Price (e.g. $28)","input"],["desc","Description","textarea"],["images","Photos (carousel — first one is the thumbnail)","images"],["video","Video URL (optional — .mp4 or YouTube)","input"],["link","Buy link (optional)","input"],["linkLabel","Button label (e.g. Shop)","input"]],
   gallery:[["cap","Caption","input"],["img","Image URL","input"]],
   taproom:[["cap","Caption (optional)","input"],["img","Photo","image"]],
@@ -346,7 +346,7 @@ function curArr(){ return data[srcKey()]; }
 const BLANK = {
   beers:{name:"New beer",type:"",abv:"",tag:"",logo:"",desc:""},
   seltzers:{name:"New seltzer",type:"Hard Seltzer",abv:"5%",tag:"Seltzer",desc:""},
-  pizzas:{name:"New item",tag:"",date:"",price:"",desc:"",img:""},
+  pizzas:{name:"New item",tag:"",date:"",price:"",desc:"",img:"",hidden:false},
   merch:{name:"New item",price:"",desc:"",images:[],video:"",link:"",linkLabel:""},
   gallery:{cap:"New photo",img:""},
   taproom:{cap:"",img:""},
